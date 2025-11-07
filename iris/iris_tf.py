@@ -2,6 +2,9 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 
+# Decide to use batching or not
+USE_BATCHING = True
+
 
 # IRIS data
 # IRIS has 4 features
@@ -67,17 +70,21 @@ train_idx, test_idx = indices[:train_split], indices[train_split:]
 x_train, y_train = features[train_idx], labels[train_idx]
 x_test, y_test = features[test_idx], labels[test_idx]
 
-# If we are using batching   
-#batch_size = 16
-#train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(100).batch(batch_size)
-#test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(batch_size)
+# If we are using batching
+if USE_BATCHING:
+    batch_size = 16
+    train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(100).batch(batch_size)
+    test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(batch_size)
+
+
 
 print("================ Data splitting and loading complete. Starting Neural Net (Model) construction ============")
 
 # Model: input -> one hidden dense -> output (3 classes)
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(4,)),
-    tf.keras.layers.Dense(8, activation='relu'),
+    tf.keras.layers.Dense(5, activation='relu'),
+    tf.keras.layers.Dense(4, activation='relu'),
     tf.keras.layers.Dense(3, activation='softmax')
 ])
 
@@ -91,12 +98,10 @@ model.summary()
 
 print("================ Model Construction Complete. Starting training ============")
 
-# Train
-# Using batching
-#history = model.fit(train_ds, epochs=200, validation_data=test_ds)
-
-# all the data at once (no batching)
-history = model.fit(x_train, y_train, epochs=200, validation_data=(x_test, y_test))
+if USE_BATCHING:
+    history = model.fit(train_ds, epochs=200, validation_data=test_ds)
+else:
+    history = model.fit(x_train, y_train, epochs=200, validation_data=(x_test, y_test))
 
 # TODO: Save the model to file to we can load it later without retraining
 # model.save('iris_model.h5')
@@ -106,10 +111,9 @@ print("================Training complete.============")
 print("Evaluating on test data...")
 
 # Evaluate
-# This works for batching
-# loss, acc = model.evaluate(test_ds)
-
-# Evaluate without batching
-loss, acc = model.evaluate(x_test, y_test)
+if USE_BATCHING:
+    loss, acc = model.evaluate(test_ds)
+else:
+    loss, acc = model.evaluate(x_test, y_test)
 
 print(f"Test loss: {loss:.4f}, Test accuracy: {acc:.4f}")
