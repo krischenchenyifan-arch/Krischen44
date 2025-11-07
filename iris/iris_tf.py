@@ -54,3 +54,49 @@ dataset = tf.data.Dataset.from_tensor_slices((features, labels))
 # Iterate and print elements
 for element in dataset:
     print(element)
+
+
+# Split into train / test
+num_samples = features.shape[0]
+indices = np.arange(num_samples)
+np.random.seed(42)
+np.random.shuffle(indices)
+train_split = int(0.8 * num_samples)
+train_idx, test_idx = indices[:train_split], indices[train_split:]
+
+x_train, y_train = features[train_idx], labels[train_idx]
+x_test, y_test = features[test_idx], labels[test_idx]
+
+batch_size = 16
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(100).batch(batch_size)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(batch_size)
+
+print("================ Data splitting and loading complete. Starting Neural Net (Model) construction ============")
+
+# Model: input -> one hidden dense -> output (3 classes)
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(4,)),
+    tf.keras.layers.Dense(8, activation='relu'),
+    tf.keras.layers.Dense(3, activation='softmax')
+])
+
+model.compile(
+    optimizer='adam',
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    metrics=['accuracy']
+)
+
+model.summary()
+
+print("================ Model Construction Complete. Starting training ============")
+
+# Train
+history = model.fit(train_ds, epochs=200, validation_data=test_ds)
+
+print("================Training complete.============")
+
+print("Evaluating on test data...")
+
+# Evaluate
+loss, acc = model.evaluate(test_ds)
+print(f"Test loss: {loss:.4f}, Test accuracy: {acc:.4f}")
