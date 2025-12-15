@@ -1,5 +1,35 @@
-#include <stdio.h>
-#include <math.h>
+#include "riemann.h"
+
+// Return the maximum CFL number across all cells
+double CPU_Compute_Max_CFL(double *p0, double *p1, double *p2, float DX, float DT, float NO_CELLS) {
+	float MAX_CFL = -1.0;
+	for (int cell = 0; cell < NO_CELLS; cell++) {
+		// Extract rho, u and T out from the arrays
+		double rho = p0[cell];
+		double u = p1[cell];
+		double T = p2[cell];
+		// Check the temperature
+		if (T < 0) {
+			printf("Error: Negative temperature in cell %d: T = %f\n. Aborting.", cell, T);
+			exit(1);
+		}
+		double a = sqrt(1.4 * 1.0 * T); // GAMMA = 1.4, R = 1.0
+		double CFL = (fabs(u) + a) * (DT / DX);
+		if (CFL > MAX_CFL) {
+			MAX_CFL = CFL;
+		}
+	}
+
+	// Check the return value
+	if (MAX_CFL < 0) {
+		printf("Error: MAX_CFL is negative!. Aborting. \n");
+		exit(1);
+	} else {
+		return MAX_CFL;
+	}
+}
+
+
 
 void CPU_Calc_Flux(double *flux, double *interface_p,
     double QL_rho, double QL_ux, double QL_vy, double QL_vz, double QL_cRT,
