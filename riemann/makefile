@@ -1,3 +1,3 @@
 all:
-	gcc main.c riemann.c -O3 -lm -o test.run
+	gcc main.c riemann.c -O0 -lm -o test.run
 
