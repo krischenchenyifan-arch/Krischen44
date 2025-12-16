@@ -66,7 +66,7 @@ test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(batch_size)
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(features.shape[1],)),
     tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001)),
-    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dropout(0.2),
     tf.keras.layers.Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001)),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(1, activation='linear')  # 回歸輸出
@@ -83,16 +83,30 @@ model.summary()
 # ==============================
 # 5. 訓練模型（含 EarlyStopping）
 # ==============================
+
 early_stop = EarlyStopping(monitor='val_loss', patience=30, restore_best_weights=True)
+# patience = 
+# restore_best_weights =
+
 
 print("\n================ Start Training ============")
 history = model.fit(
     train_ds,
-    epochs=500,
+    epochs=100,
     validation_data=test_ds,
-    callbacks=[early_stop],
+    callbacks=[],
     verbose=2
 )
+
+# Source - https://stackoverflow.com/a
+# Posted by Onno Kampman, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-14, License - CC BY-SA 3.0
+
+for layer in model.layers:
+    print(layer.get_config(), layer.get_weights())
+
+#     callbacks=[early_stop],
+
 
 # ==============================
 # 6. 評估模型
@@ -119,7 +133,7 @@ for i in range(10):
 # ==============================
 # 8. 可選：儲存模型
 # ==============================
-# model.save('abalone_best_model.h5')
+model.save('abalone_best_model.h5')
 
 
 
