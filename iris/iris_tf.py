@@ -84,6 +84,7 @@ print("================ Data splitting and loading complete. Starting Neural Net
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(4,)),
     tf.keras.layers.Dense(5, activation='relu'),
+    tf.keras.layers.Dense(4, activation='relu'),
     tf.keras.layers.Dense(3, activation='softmax')
 ])
 
