@@ -84,7 +84,6 @@ print("================ Data splitting and loading complete. Starting Neural Net
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(4,)),
     tf.keras.layers.Dense(5, activation='relu'),
-    tf.keras.layers.Dense(4, activation='relu'),
     tf.keras.layers.Dense(3, activation='softmax')
 ])
 
@@ -103,10 +102,16 @@ if USE_BATCHING:
 else:
     history = model.fit(x_train, y_train, epochs=200, validation_data=(x_test, y_test))
 
+
 # TODO: Save the model to file to we can load it later without retraining
-# model.save('iris_model.h5')
+model.save('iris_model.h5')
 
 print("================Training complete.============")
+for i, layer in enumerate(model.layers):
+    weights, biases = layer.get_weights()
+    print(f"\n===== Layer {i} =====")
+    print("Weights:\n", weights)
+    print("Biases:\n", biases)
 
 print("Evaluating on test data...")
 
@@ -116,4 +121,14 @@ if USE_BATCHING:
 else:
     loss, acc = model.evaluate(x_test, y_test)
 
+
+# Now we can use our model to test a single input flow
+print("Test single input prediction")
+# input_test = [7.2, 3.0, 5.8, 1.6]  # Example input for type 2 (out of 0,1,2)
+input_test = [6.0,3.4,4.5,1.6] # Example input for type 1 (out of 0,1,2)
+input_array = np.array([input_test])  # Model expects a batch, so make it 2D
+predictions = model.predict(input_array)
+print("Predictions for input", input_test, ":", predictions)
+
+print("---------- Overall ------------")
 print(f"Test loss: {loss:.4f}, Test accuracy: {acc:.4f}")
