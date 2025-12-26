@@ -32,8 +32,8 @@ Load labels from file
 labels = (data[:, 10].copy() - 1).astype(int)
 #Glass dataset lables are from 1 to 7(with 4 being empty), we convert them to 0 to 6 for tf.keras
 
-scaler = StandardScaler()
-features = scaler.fit_transform(features)
+#scaler = StandardScaler()
+#features = scaler.fit_transform(features)
 
 # Create a tf.data.Dataset
 dataset = tf.data.Dataset.from_tensor_slices((features, labels))
@@ -45,7 +45,7 @@ for element in dataset:
 # Split into train / test
 num_samples = features.shape[0]
 indices = np.arange(num_samples)
-np.random.seed(70)
+np.random.seed(100)
 np.random.shuffle(indices)
 train_split = int(0.7 * num_samples)
 train_idx, test_idx = indices[:train_split], indices[train_split:]
@@ -68,13 +68,13 @@ if USE_BATCHING:
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(9,)),
     tf.keras.layers.Dense(19, activation='sigmoid'),
-    tf.keras.layers.Dense(7, activation='sigmoid')
+    tf.keras.layers.Dense(7, activation='softmax')
 ])
 
 model.compile(
-    optimizer='adam',
+    #optimizer='adam',
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
     loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-    #loss='sparse_categorical_crossentropy'
     metrics=['accuracy']
 )
 
@@ -84,9 +84,9 @@ model.summary()
 print("================ Model Construction Complete. Starting training ============")
 
 if USE_BATCHING:
-    history = model.fit(train_ds, epochs=2000, validation_data=test_ds)
+    history = model.fit(train_ds, epochs=1000, validation_data=test_ds)
 else:
-    history = model.fit(x_train, y_train, epochs=2000, validation_data=(x_test, y_test))
+    history = model.fit(x_train, y_train, epochs=1000, validation_data=(x_test, y_test))
 
 # TODO: Save the model to file to we can load it later without retraining
 model.save('glass_model.keras')
