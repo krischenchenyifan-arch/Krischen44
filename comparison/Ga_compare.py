@@ -4,34 +4,7 @@ import math
 
 import tools_ga as tools
 import baby_ga as baby
-
-# ---- 演算法 2：GA (#2) 三父母含變異機制 ----
-def ComputeNextGen_GA2(DNA, FITNESS, BESTINDEX, FR, SIGMA):
-    NO_KIDS, NO_VAR = DNA.shape
-    trial_dna = np.empty(NO_VAR)
-    new_dna = DNA.copy()
-    new_fitness = FITNESS.copy()
-    
-    for i in range(NO_KIDS):
-        Parent_A = BESTINDEX
-        Parent_B = Parent_A
-        Parent_C = Parent_A
-        while ((Parent_A == Parent_B) or (Parent_A == Parent_C) or (Parent_B == Parent_C)):
-            Parent_B = np.random.randint(NO_KIDS)
-            Parent_C = np.random.randint(NO_KIDS)
-            
-        # X_baby = X_baby + randn() * (X_B - X_C) 邏輯
-        for j in range(NO_VAR):
-            Rf = FR * tools.MaxMod(np.random.rand())
-            Rnf = SIGMA * np.random.randn()
-            trial_dna[j] = Rf * DNA[Parent_A, j] + (1.0 - Rf) * DNA[Parent_B, j] + Rnf * (DNA[Parent_B, j] - DNA[Parent_C, j])
-            
-        trial_fitness = tools.ComputeFitness(trial_dna)
-        if (np.absolute(trial_fitness) < np.absolute(FITNESS[i])):
-            new_fitness[i] = trial_fitness
-            new_dna[i, :] = trial_dna
-    return new_dna, new_fitness
-
+import smith_ga as smith
 
 # ==================== 主程式開始 ====================
 
@@ -73,7 +46,7 @@ for gen in range(NO_GEN):
     history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
     
     # 執行 GA (#2)
-    dna_ga2, fit_ga2 = ComputeNextGen_GA2(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
+    dna_ga2, fit_ga2 = smith.ComputeNextGen_GA2(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
     best_ga2 = tools.ComputeBestKid(fit_ga2)
     history_fit_ga2[gen] = fit_ga2[best_ga2]
     history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
