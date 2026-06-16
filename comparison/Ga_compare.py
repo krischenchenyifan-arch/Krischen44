@@ -4,13 +4,6 @@ import math
 
 import tools_ga as tools
 
-def MaxMod(X):
-    # GA (#2) 需要使用的權重調節函數
-    if (X > 0.5):
-        return X
-    else:
-        return (1.0 - X)
-
 # ---- 演算法 1：GA (#1) 兩父母混合機制 ----
 def ComputeNextGen_GA1(DNA, FITNESS, BESTINDEX):
     NO_KIDS, NO_VAR = DNA.shape
@@ -52,7 +45,7 @@ def ComputeNextGen_GA2(DNA, FITNESS, BESTINDEX, FR, SIGMA):
             
         # X_baby = X_baby + randn() * (X_B - X_C) 邏輯
         for j in range(NO_VAR):
-            Rf = FR * MaxMod(np.random.rand())
+            Rf = FR * tools.MaxMod(np.random.rand())
             Rnf = SIGMA * np.random.randn()
             trial_dna[j] = Rf * DNA[Parent_A, j] + (1.0 - Rf) * DNA[Parent_B, j] + Rnf * (DNA[Parent_B, j] - DNA[Parent_C, j])
             

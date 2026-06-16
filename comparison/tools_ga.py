@@ -4,6 +4,13 @@
 
 import numpy as np
 
+def MaxMod(X):
+    # GA (#2) 需要使用的權重調節函數
+    if (X > 0.5):
+        return X
+    else:
+        return (1.0 - X)
+
 def ComputeFitness(x):
     # 目標函數：f(x) = 5 - x^2
     X = x[0]
