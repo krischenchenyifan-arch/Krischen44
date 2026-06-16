@@ -3,30 +3,7 @@ import numpy as np
 import math
 
 import tools_ga as tools
-
-# ---- 演算法 1：GA (#1) 兩父母混合機制 ----
-def ComputeNextGen_GA1(DNA, FITNESS, BESTINDEX):
-    NO_KIDS, NO_VAR = DNA.shape
-    trial_dna = np.empty(NO_VAR)
-    new_dna = DNA.copy()
-    new_fitness = FITNESS.copy()
-    
-    for i in range(NO_KIDS):
-        Parent_A = BESTINDEX
-        Parent_B = Parent_A
-        while (Parent_A == Parent_B):
-            Parent_B = np.random.randint(NO_KIDS)
-            
-        # X_baby = 1/2 * (X_A + X_B)
-        for j in range(NO_VAR):
-            W = 0.5
-            trial_dna[j] = W * DNA[Parent_A, j] + (1.0 - W) * DNA[Parent_B, j]
-            
-        trial_fitness = tools.ComputeFitness(trial_dna)
-        if (np.absolute(trial_fitness) < np.absolute(FITNESS[i])):
-            new_fitness[i] = trial_fitness
-            new_dna[i, :] = trial_dna
-    return new_dna, new_fitness
+import baby_ga as baby
 
 # ---- 演算法 2：GA (#2) 三父母含變異機制 ----
 def ComputeNextGen_GA2(DNA, FITNESS, BESTINDEX, FR, SIGMA):
@@ -90,7 +67,7 @@ history_dna_ga2 = np.zeros((NO_GEN, NO_VAR))
 # 2. 開始同時演化
 for gen in range(NO_GEN):
     # 執行 GA (#1)
-    dna_ga1, fit_ga1 = ComputeNextGen_GA1(dna_ga1, fit_ga1, best_ga1)
+    dna_ga1, fit_ga1 = baby.ComputeNextGen_GA1(dna_ga1, fit_ga1, best_ga1)
     best_ga1 = tools.ComputeBestKid(fit_ga1)
     history_fit_ga1[gen] = fit_ga1[best_ga1]
     history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
