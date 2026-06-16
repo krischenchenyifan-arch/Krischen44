@@ -17,7 +17,7 @@ SIGMA = 0.5  # 調整擾動標準差，避免一維問題跳躍過大
 
 # 1. 產生初始群體 DNA (起跑點)
 initial_dna = 5.0 * np.random.rand(NO_KIDS, NO_VAR)
-initial_fitness = np.zeros(NO_KIDS)
+initial_fitness = np.empty(NO_KIDS)
 for i in range(NO_KIDS):
     initial_fitness[i] = tools.ComputeFitness(initial_dna[i, :])
 
@@ -37,6 +37,14 @@ history_dna_ga1 = np.zeros((NO_GEN, NO_VAR))
 history_fit_ga2 = np.empty(NO_GEN)
 history_dna_ga2 = np.zeros((NO_GEN, NO_VAR))
 
+# Let's save the fitness for all Generations for all children
+history_fit_all_ga1 = np.empty((NO_GEN, NO_KIDS))
+history_fit_all_ga2 = np.empty((NO_GEN, NO_KIDS))
+# Let's also save the variables for all Generations for all children
+history_dna_all_ga1 = np.empty((NO_GEN,NO_KIDS,NO_VAR))
+history_dna_all_ga2 = np.empty((NO_GEN,NO_KIDS,NO_VAR))
+
+
 # 2. 開始同時演化
 for gen in range(NO_GEN):
     # 執行 GA (#1)
@@ -44,12 +52,19 @@ for gen in range(NO_GEN):
     best_ga1 = tools.ComputeBestKid(fit_ga1)
     history_fit_ga1[gen] = fit_ga1[best_ga1]
     history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
-    
+    history_fit_all_ga1[gen,:] = fit_ga1[:]
+    history_dna_all_ga1[gen,:,:] = dna_ga1[:,:]
+
+    # Inspect
+
+
     # 執行 GA (#2)
     dna_ga2, fit_ga2 = smith.ComputeNextGen_GA(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
     best_ga2 = tools.ComputeBestKid(fit_ga2)
     history_fit_ga2[gen] = fit_ga2[best_ga2]
     history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
+    history_fit_all_ga2[gen,:] = fit_ga2[:]
+    history_dna_all_ga2[gen,:,:] = dna_ga2[:,:]
 
 
 # ==================== 繪圖呈現 ====================
@@ -57,28 +72,28 @@ for gen in range(NO_GEN):
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
 # 圖左：DNA 估計值的收斂路徑比較
-ax1.plot(history_dna_ga1, 'b-o', label='GA (#1) - 2 Parents')
-ax1.plot(history_dna_ga2, 'r-s', label='GA (#2) - 3 Parents + Var')
+ax1.plot(history_dna_all_ga1[:,:,0], 'b-o', label='GA (#1) - 2 Parents')
+ax1.plot(history_dna_all_ga2[:,:,0], 'r-s', label='GA (#2) - 3 Parents + Var')
 ax1.axhline(y=math.sqrt(5), color='g', linestyle='--', label='Target sqrt(5)')
 ax1.set_xlabel('Generation Number')
 ax1.set_ylabel('Estimated DNA Value (x)')
 ax1.set_title('DNA Value (x) Convergence')
-ax1.legend()
+#ax1.legend()
 ax1.grid(True)
 
 # 圖右：適應度絕對值差距下降曲線比較 (|Fitness|)
-ax2.plot(np.absolute(history_fit_ga1), 'b-o', label='GA (#1) - 2 Parents')
-ax2.plot(np.absolute(history_fit_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
+ax2.plot(np.absolute(history_fit_all_ga1), 'b-o', label='GA (#1) - 2 Parents')
+ax2.plot(np.absolute(history_fit_all_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
 ax2.set_yscale('log')  # 使用對數座標，更能看出微小差距的逼近
 ax2.set_xlabel('Generation Number')
 ax2.set_ylabel('Absolute Fitness |5 - x^2|')
 ax2.set_title('Fitness Error Decay (Log Scale)')
-ax2.legend()
+#ax2.legend()
 ax2.grid(True)
 
 plt.tight_layout()
-plt.savefig('comparision.png')
-
+#plt.savefig('comparision.png')
+plt.show()
 
 # ==================== INDIVIDUAL FINAL REPORTS ====================
 
