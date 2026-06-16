@@ -5,7 +5,7 @@
 import numpy as np
 import tools_ga as tools
 
-def ComputeNextGen_GA1(DNA, FITNESS, BESTINDEX):
+def ComputeNextGen_GA(DNA, FITNESS, BESTINDEX):
     NO_KIDS, NO_VAR = DNA.shape
     trial_dna = np.empty(NO_VAR)
     new_dna = DNA.copy()

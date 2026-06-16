@@ -40,13 +40,13 @@ history_dna_ga2 = np.zeros((NO_GEN, NO_VAR))
 # 2. 開始同時演化
 for gen in range(NO_GEN):
     # 執行 GA (#1)
-    dna_ga1, fit_ga1 = baby.ComputeNextGen_GA1(dna_ga1, fit_ga1, best_ga1)
+    dna_ga1, fit_ga1 = baby.ComputeNextGen_GA(dna_ga1, fit_ga1, best_ga1)
     best_ga1 = tools.ComputeBestKid(fit_ga1)
     history_fit_ga1[gen] = fit_ga1[best_ga1]
     history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
     
     # 執行 GA (#2)
-    dna_ga2, fit_ga2 = smith.ComputeNextGen_GA2(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
+    dna_ga2, fit_ga2 = smith.ComputeNextGen_GA(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
     best_ga2 = tools.ComputeBestKid(fit_ga2)
     history_fit_ga2[gen] = fit_ga2[best_ga2]
     history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
