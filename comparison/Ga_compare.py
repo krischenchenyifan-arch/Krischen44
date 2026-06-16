@@ -2,12 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-# ==================== 核心函式定義 ====================
+import tools_ga as tools
 
-def ComputeFitness(x):
-    # 目標函數：f(x) = 5 - x^2
-    X = x[0]
-    return 5.0 - X**2
 
 def ComputeBestKid(FITNESS):
     # 尋找適應度絕對值最接近 0 (最優秀) 的個體索引
@@ -45,7 +41,7 @@ def ComputeNextGen_GA1(DNA, FITNESS, BESTINDEX):
             W = 0.5
             trial_dna[j] = W * DNA[Parent_A, j] + (1.0 - W) * DNA[Parent_B, j]
             
-        trial_fitness = ComputeFitness(trial_dna)
+        trial_fitness = tools.ComputeFitness(trial_dna)
         if (np.absolute(trial_fitness) < np.absolute(FITNESS[i])):
             new_fitness[i] = trial_fitness
             new_dna[i, :] = trial_dna
@@ -72,7 +68,7 @@ def ComputeNextGen_GA2(DNA, FITNESS, BESTINDEX, FR, SIGMA):
             Rnf = SIGMA * np.random.randn()
             trial_dna[j] = Rf * DNA[Parent_A, j] + (1.0 - Rf) * DNA[Parent_B, j] + Rnf * (DNA[Parent_B, j] - DNA[Parent_C, j])
             
-        trial_fitness = ComputeFitness(trial_dna)
+        trial_fitness = tools.ComputeFitness(trial_dna)
         if (np.absolute(trial_fitness) < np.absolute(FITNESS[i])):
             new_fitness[i] = trial_fitness
             new_dna[i, :] = trial_dna
@@ -92,7 +88,7 @@ SIGMA = 0.5  # 調整擾動標準差，避免一維問題跳躍過大
 initial_dna = 5.0 * np.random.rand(NO_KIDS, NO_VAR)
 initial_fitness = np.zeros(NO_KIDS)
 for i in range(NO_KIDS):
-    initial_fitness[i] = ComputeFitness(initial_dna[i, :])
+    initial_fitness[i] = tools.ComputeFitness(initial_dna[i, :])
 
 # ---- 分流複製給 GA1 與 GA2 ----
 dna_ga1 = initial_dna.copy()
