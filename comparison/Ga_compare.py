@@ -44,6 +44,10 @@ history_fit_all_ga2 = np.empty((NO_GEN, NO_KIDS))
 history_dna_all_ga1 = np.empty((NO_GEN,NO_KIDS,NO_VAR))
 history_dna_all_ga2 = np.empty((NO_GEN,NO_KIDS,NO_VAR))
 
+# Now let's save the average fitness
+history_fit_average_ga1 = np.empty((NO_GEN))
+history_fit_average_ga2 = np.empty((NO_GEN))
+
 
 # 2. 開始同時演化
 for gen in range(NO_GEN):
@@ -54,8 +58,7 @@ for gen in range(NO_GEN):
     history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
     history_fit_all_ga1[gen,:] = fit_ga1[:]
     history_dna_all_ga1[gen,:,:] = dna_ga1[:,:]
-
-    # Inspect
+    history_fit_average_ga1[gen] = fit_ga1[:].mean()
 
 
     # 執行 GA (#2)
@@ -65,6 +68,7 @@ for gen in range(NO_GEN):
     history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
     history_fit_all_ga2[gen,:] = fit_ga2[:]
     history_dna_all_ga2[gen,:,:] = dna_ga2[:,:]
+    history_fit_average_ga2[gen] = fit_ga2[:].mean()
 
 
 # ==================== 繪圖呈現 ====================
@@ -82,8 +86,12 @@ ax1.set_title('DNA Value (x) Convergence')
 ax1.grid(True)
 
 # 圖右：適應度絕對值差距下降曲線比較 (|Fitness|)
-ax2.plot(np.absolute(history_fit_all_ga1), 'b-o', label='GA (#1) - 2 Parents')
-ax2.plot(np.absolute(history_fit_all_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
+# Plot all fitness values
+#ax2.plot(np.absolute(history_fit_all_ga1), 'b-o', label='GA (#1) - 2 Parents')
+#ax2.plot(np.absolute(history_fit_all_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
+# Plot average fitness values
+ax2.plot(np.absolute(history_fit_average_ga1), 'b-o', label='GA (#1) - 2 Parents')
+ax2.plot(np.absolute(history_fit_average_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
 ax2.set_yscale('log')  # 使用對數座標，更能看出微小差距的逼近
 ax2.set_xlabel('Generation Number')
 ax2.set_ylabel('Absolute Fitness |5 - x^2|')
