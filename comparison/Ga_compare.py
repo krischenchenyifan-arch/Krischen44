@@ -4,18 +4,6 @@ import math
 
 import tools_ga as tools
 
-
-def ComputeBestKid(FITNESS):
-    # 尋找適應度絕對值最接近 0 (最優秀) 的個體索引
-    NO_KIDS = len(FITNESS)
-    BestFitness = 10000.0
-    BestIndex = -1
-    for i in range(NO_KIDS):
-        if (np.absolute(FITNESS[i]) < BestFitness):
-            BestFitness = np.absolute(FITNESS[i])
-            BestIndex = i
-    return BestIndex
-
 def MaxMod(X):
     # GA (#2) 需要使用的權重調節函數
     if (X > 0.5):
@@ -93,11 +81,11 @@ for i in range(NO_KIDS):
 # ---- 分流複製給 GA1 與 GA2 ----
 dna_ga1 = initial_dna.copy()
 fit_ga1 = initial_fitness.copy()
-best_ga1 = ComputeBestKid(fit_ga1)
+best_ga1 = tools.ComputeBestKid(fit_ga1)
 
 dna_ga2 = initial_dna.copy()
 fit_ga2 = initial_fitness.copy()
-best_ga2 = ComputeBestKid(fit_ga2)
+best_ga2 = tools.ComputeBestKid(fit_ga2)
 
 # 歷史紀錄陣列
 history_fit_ga1 = np.empty(NO_GEN)
@@ -110,13 +98,13 @@ history_dna_ga2 = np.zeros((NO_GEN, NO_VAR))
 for gen in range(NO_GEN):
     # 執行 GA (#1)
     dna_ga1, fit_ga1 = ComputeNextGen_GA1(dna_ga1, fit_ga1, best_ga1)
-    best_ga1 = ComputeBestKid(fit_ga1)
+    best_ga1 = tools.ComputeBestKid(fit_ga1)
     history_fit_ga1[gen] = fit_ga1[best_ga1]
     history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
     
     # 執行 GA (#2)
     dna_ga2, fit_ga2 = ComputeNextGen_GA2(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
-    best_ga2 = ComputeBestKid(fit_ga2)
+    best_ga2 = tools.ComputeBestKid(fit_ga2)
     history_fit_ga2[gen] = fit_ga2[best_ga2]
     history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
 
