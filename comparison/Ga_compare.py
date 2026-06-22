@@ -14,21 +14,7 @@ NO_VAR = 1   # 一維問題
 NO_GEN = 15  # 稍微拉長代數到 15 代，觀察收斂對比
 FR = 1.0
 SIGMA = 0.5  # 調整擾動標準差，避免一維問題跳躍過大
-
-# 1. 產生初始群體 DNA (起跑點)
-initial_dna = 5.0 * np.random.rand(NO_KIDS, NO_VAR)
-initial_fitness = np.empty(NO_KIDS)
-for i in range(NO_KIDS):
-    initial_fitness[i] = tools.ComputeFitness(initial_dna[i, :])
-
-# ---- 分流複製給 GA1 與 GA2 ----
-dna_ga1 = initial_dna.copy()
-fit_ga1 = initial_fitness.copy()
-best_ga1 = tools.ComputeBestKid(fit_ga1)
-
-dna_ga2 = initial_dna.copy()
-fit_ga2 = initial_fitness.copy()
-best_ga2 = tools.ComputeBestKid(fit_ga2)
+EPOCH = 20
 
 # 歷史紀錄陣列
 history_fit_ga1 = np.empty(NO_GEN)
@@ -45,30 +31,46 @@ history_dna_all_ga1 = np.empty((NO_GEN,NO_KIDS,NO_VAR))
 history_dna_all_ga2 = np.empty((NO_GEN,NO_KIDS,NO_VAR))
 
 # Now let's save the average fitness
-history_fit_average_ga1 = np.empty((NO_GEN))
-history_fit_average_ga2 = np.empty((NO_GEN))
+history_fit_average_ga1 = np.empty((NO_GEN, EPOCH))
+history_fit_average_ga2 = np.empty((NO_GEN, EPOCH))
 
 
-# 2. 開始同時演化
-for gen in range(NO_GEN):
-    # 執行 GA (#1)
-    dna_ga1, fit_ga1 = baby.ComputeNextGen_GA(dna_ga1, fit_ga1, best_ga1)
+for epoch in range(EPOCH):
+    # 1. 產生初始群體 DNA (起跑點)
+    initial_dna = 5.0 * np.random.rand(NO_KIDS, NO_VAR)
+    initial_fitness = np.empty(NO_KIDS)
+    for i in range(NO_KIDS):
+        initial_fitness[i] = tools.ComputeFitness(initial_dna[i, :])
+
+    # ---- 分流複製給 GA1 與 GA2 ----
+    dna_ga1 = initial_dna.copy()
+    fit_ga1 = initial_fitness.copy()
     best_ga1 = tools.ComputeBestKid(fit_ga1)
-    history_fit_ga1[gen] = fit_ga1[best_ga1]
-    history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
-    history_fit_all_ga1[gen,:] = fit_ga1[:]
-    history_dna_all_ga1[gen,:,:] = dna_ga1[:,:]
-    history_fit_average_ga1[gen] = fit_ga1[:].mean()
 
-
-    # 執行 GA (#2)
-    dna_ga2, fit_ga2 = smith.ComputeNextGen_GA(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
+    dna_ga2 = initial_dna.copy()
+    fit_ga2 = initial_fitness.copy()
     best_ga2 = tools.ComputeBestKid(fit_ga2)
-    history_fit_ga2[gen] = fit_ga2[best_ga2]
-    history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
-    history_fit_all_ga2[gen,:] = fit_ga2[:]
-    history_dna_all_ga2[gen,:,:] = dna_ga2[:,:]
-    history_fit_average_ga2[gen] = fit_ga2[:].mean()
+
+    # 2. 開始同時演化
+    for gen in range(NO_GEN):
+        # 執行 GA (#1)
+        dna_ga1, fit_ga1 = baby.ComputeNextGen_GA(dna_ga1, fit_ga1, best_ga1)
+        best_ga1 = tools.ComputeBestKid(fit_ga1)
+        history_fit_ga1[gen] = fit_ga1[best_ga1]
+        history_dna_ga1[gen, :] = dna_ga1[best_ga1, :]
+        history_fit_all_ga1[gen,:] = fit_ga1[:]
+        history_dna_all_ga1[gen,:,:] = dna_ga1[:,:]
+        history_fit_average_ga1[gen, epoch] = fit_ga1[:].mean()
+
+
+        # 執行 GA (#2)
+        dna_ga2, fit_ga2 = smith.ComputeNextGen_GA(dna_ga2, fit_ga2, best_ga2, FR, SIGMA)
+        best_ga2 = tools.ComputeBestKid(fit_ga2)
+        history_fit_ga2[gen] = fit_ga2[best_ga2]
+        history_dna_ga2[gen, :] = dna_ga2[best_ga2, :]
+        history_fit_all_ga2[gen,:] = fit_ga2[:]
+        history_dna_all_ga2[gen,:,:] = dna_ga2[:,:]
+        history_fit_average_ga2[gen, epoch] = fit_ga2[:].mean()
 
 
 # ==================== 繪圖呈現 ====================
@@ -76,8 +78,8 @@ for gen in range(NO_GEN):
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
 # 圖左：DNA 估計值的收斂路徑比較
-ax1.plot(history_dna_all_ga1[:,:,0], 'b-o', label='GA (#1) - 2 Parents')
-ax1.plot(history_dna_all_ga2[:,:,0], 'r-s', label='GA (#2) - 3 Parents + Var')
+ax1.plot(np.mean(history_dna_all_ga1[:,:,0], axis=1), 'b-o', label='GA (#1) - 2 Parents(Mean)')
+ax1.plot(np.mean(history_dna_all_ga2[:,:,0], axis=1), 'r-s', label='GA (#2) - 3 Parents + Var(Mean)')
 ax1.axhline(y=math.sqrt(5), color='g', linestyle='--', label='Target sqrt(5)')
 ax1.set_xlabel('Generation Number')
 ax1.set_ylabel('Estimated DNA Value (x)')
@@ -90,8 +92,8 @@ ax1.grid(True)
 #ax2.plot(np.absolute(history_fit_all_ga1), 'b-o', label='GA (#1) - 2 Parents')
 #ax2.plot(np.absolute(history_fit_all_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
 # Plot average fitness values
-ax2.plot(np.absolute(history_fit_average_ga1), 'b-o', label='GA (#1) - 2 Parents')
-ax2.plot(np.absolute(history_fit_average_ga2), 'r-s', label='GA (#2) - 3 Parents + Var')
+ax2.plot(np.mean(np.absolute(history_fit_average_ga1), axis=1), 'b-o', label='GA (#1) - 2 Parents(Mean)')
+ax2.plot(np.mean(np.absolute(history_fit_average_ga2), axis=1), 'r-s', label='GA (#2) - 3 Parents + Var(Mean)')
 ax2.set_yscale('log')  # 使用對數座標，更能看出微小差距的逼近
 ax2.set_xlabel('Generation Number')
 ax2.set_ylabel('Absolute Fitness |5 - x^2|')
