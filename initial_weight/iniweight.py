@@ -1,5 +1,5 @@
-#類別的基本程式練習 ——create random weight
 import numpy as np
+#類別的基本程式練習 ——create random weight
 class Weight:
 	#初始化特徵(Attributes)
 	#本情況中有self和id兩種特徵
