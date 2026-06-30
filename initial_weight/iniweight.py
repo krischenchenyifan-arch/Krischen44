@@ -31,6 +31,10 @@ cat2 = Cat("Chen", "red")
 print(cat1.name)
 print(cat2.color)
 #print(cat1.meow())
+#傳回None，print()沒有傳回值
+#a = print('Python')
+#print(a)
+#None
 cat1.meow()
 #如果函式裡有print了，外面不用print
 #函式裡用return，外面要print
