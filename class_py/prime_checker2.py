@@ -24,7 +24,7 @@ class Primechecker2:
 
 limit = 20
 print(Primechecker2.find_prime(limit))
-How to get a integer?
+How to get an integer?
 int(x)		無條件捨去
 round(x)	四捨五入
 math.floor(x)	無條件捨去
