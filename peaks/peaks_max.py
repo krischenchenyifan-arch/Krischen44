@@ -4,21 +4,19 @@ import numpy as np
 import math
 
 def ComputeFitness(x):
-        # Compute the fitness based on genetic data X
-        # X is an array of dimension (NO_VAR - in this case, NO_VAR = 2)
-        # The goal of the GA is the find the value of X which results
-        # in a maximum or mimimum value of this fitness function.
+    # Compute the fitness based on genetic data X
+    # X is an array of dimension (NO_VAR - in this case, NO_VAR = 2)
+    # The goal of the GA is the find the value of X which results
+    # in a maximum or mimimum value of this fitness function.
 
-        # Compute the Peaks function
-        # X = x[0], Y = x[1]
-        X = x[0]
-        Y = x[1]
-        fitness = 3*(1-X)**2*math.exp(-(X**2) - (Y+1)**2) \
-        - 10*(X/5 - X**3 - Y**5)*math.exp(-X**2-Y**2) \
-        - (1/3)*math.exp(-(X+1)**2 - Y**2)
-        return fitness
-
-
+    # Compute the Peaks function
+    # X = x[0], Y = x[1]
+    X = x[0]
+    Y = x[1]
+    fitness = 3*(1-X)**2*math.exp(-(X**2) - (Y+1)**2) \
+    - 10*(X/5 - X**3 - Y**5)*math.exp(-X**2-Y**2) \
+    - (1/3)*math.exp(-(X+1)**2 - Y**2)
+    return fitness
 
 def ComputeBestKid(FITNESS):
     # Computes the fittest child
@@ -27,12 +25,11 @@ def ComputeBestKid(FITNESS):
     BestFitness = -10000.0
     BestIndex = -1
     for i in range(NO_KIDS):
-        if (np.absolute(FITNESS[i]) > BestFitness):
+        if (FITNESS[i] > BestFitness):
             BestFitness = FITNESS[i]
             BestIndex = i
 
     return BestIndex
-
 
 def MaxMod(X):
     if (X > 0.5):
@@ -40,10 +37,8 @@ def MaxMod(X):
     else:
         return (1.0-X)
 
-
 def ComputeNextGeneration(DNA, FITNESS, BESTINDEX, FR, SIGMA):
-
-    NO_KIDS,NO_VAR = DNA.shape
+    NO_KIDS, NO_VAR = DNA.shape
     trial_dna = np.empty(NO_VAR)
 
     # Assume the next generation will be identical
@@ -78,60 +73,49 @@ def ComputeNextGeneration(DNA, FITNESS, BESTINDEX, FR, SIGMA):
     # Return the next generations data
     return new_dna, new_fitness
 
-
 # Commence the main program sequence
 # Assign solution parameters
-#NO_KIDS = 30
 NO_VAR = 2
 NO_GEN = 10
 FR = 1.0
 SIGMA = 1.0
 
 population_sizes = [10, 100]
-results = {}
+results_fitness = {}
+results_dna = {}
 
-fig, ax = plt.subplots(figsize = (10, 6))
-
-for No_KIDS in population_size:
-	print(f"start running")
-	kid_dna = -3 + 6*np.random.rand(NO_KIDS, NO_VAR)
-	kid_fitness = np.zeros(NO_KIDS)
-	history_fitness = np.empty(NO_GEN)
-	history_dna = np.zeros((NO_GEN,NO_VAR))
-
-# Initialise the problem
-# Let's check the kid's dna now to make sure we have meaningful results
-#print(f"Kids dna = {kid_dna}")
-# Find the child with the best dna
-	for i in range(NO_KIDS):
-    		kid_fitness[i] = ComputeFitness(kid_dna[i,:])
-# Find the Index of the best kid based on fitness
-	BestKid = ComputeBestKid(kid_fitness)
-#print("The best kid in the population has fitness %g at (%g, %g)" % (kid_fitness[BestKid], kid_dna[BestKid,0], kid_dna[BestKid,1]))
-
-
-# Iterate over generations to evolve the population
-	for gen in range(NO_GEN):
-    		kid_dna, kid_fitness = ComputeNextGeneration(kid_dna,kid_fitness,BestKid, FR, SIGMA)
-    		BestKid = ComputeBestKid(kid_fitness)
-    		history_fitness[gen] = kid_fitness[BestKid]
-    		history_dna[gen,:] = kid_dna[BestKid,:]
-    # Write a report
-	results_fitness[NO_KIDS] = history_fitness
-	results_dna[NO_KIDS] = history_dna
-    	print(f"N = {NO_KIDS}  best fitness = {kid_fitness[BestKid]} at ({kid_dna[BestKid,0]}, {kid_dna[BestKid,1]})")
-
-
-fig,ax = plt.subplots(figsize=(10, 6))
 for NO_KIDS in population_sizes:
-	ax.plot(results_fitness[NO_KIDS], marker='o', label=f'N = {NO_KIDS}')
+    print(f"start running for N = {NO_KIDS}")
+    kid_dna = -3 + 6*np.random.rand(NO_KIDS, NO_VAR)
+    kid_fitness = np.zeros(NO_KIDS)
+    history_fitness = np.empty(NO_GEN)
+    history_dna = np.zeros((NO_GEN, NO_VAR))
 
-ax.set(xlabel='Generation Number',ylabel='Best Fitness', title='Comparision of DE Fitness (N=10 vs N=100)')
+    # Find the child with the best dna
+    for i in range(NO_KIDS):
+        kid_fitness[i] = ComputeFitness(kid_dna[i,:])
+        
+    # Find the Index of the best kid based on fitness
+    BestKid = ComputeBestKid(kid_fitness)
+
+    # Iterate over generations to evolve the population
+    for gen in range(NO_GEN):
+        kid_dna, kid_fitness = ComputeNextGeneration(kid_dna, kid_fitness, BestKid, FR, SIGMA)
+        BestKid = ComputeBestKid(kid_fitness)
+        history_fitness[gen] = kid_fitness[BestKid]
+        history_dna[gen, :] = kid_dna[BestKid, :]
+        
+    # Store results
+    results_fitness[NO_KIDS] = history_fitness
+    results_dna[NO_KIDS] = history_dna
+    print(f"N = {NO_KIDS} best fitness = {kid_fitness[BestKid]} at ({kid_dna[BestKid,0]}, {kid_dna[BestKid,1]})")
+
+# Plotting the comparison graph
+fig, ax = plt.subplots(figsize=(10, 6))
+for NO_KIDS in population_sizes:
+    ax.plot(results_fitness[NO_KIDS], marker='o', label=f'N = {NO_KIDS}')
+
+ax.set(xlabel='Generation Number', ylabel='Best Fitness', title='Comparison of DE Fitness (N=10 vs N=100)')
+ax.legend()
+ax.grid(True)
 plt.show()
-
-#print("====== FINAL REPORT ========")
-#print("Average fitness of final generation = %g" % np.mean(kid_fitness))
-#print("Best Kid's Fitness: %g" % kid_fitness[BestKid])
-#print("Best Kid's DNA Parameter values:")
-#for i in range(NO_VAR):
-#print("-- DNA Parameter %d = %g" % (i,kid_dna[BestKid,i]))
