@@ -71,7 +71,7 @@ z8 = z8_0.output() + z8_1.output() + z8_2.output() + z8_3.output() + bias[8]
 z8_final = sigmoid(z8)
 print(f"Neuron 8 output is {z8_final}")
 
-print(f"======start calculate output layer ouputs======")
+print(f"======start calculate output layer outputs======")
 
 z9_4 = Neuron(z4_final, weight[20])
 z9_5 = Neuron(z5_final, weight[23])
