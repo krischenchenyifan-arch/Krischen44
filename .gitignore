@@ -3,3 +3,7 @@ venv/
 
 # Ignore all __pycache__ directories in all subfolders
 __pycache__/
+*.pyc
+*.exe
+*.swp
+*.save
