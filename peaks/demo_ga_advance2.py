@@ -8,10 +8,10 @@ class Neuron:
     def __init__(self, input_val, weight_val):
         self.input = input_val
         self.weight = weight_val
-    
+
     def output(self):
         return self.input * self.weight
-    
+
     @staticmethod
     def sigmoid(a):
         #OverflowError
@@ -35,41 +35,43 @@ class Neuron:
             [21, 24, 27, 30, 33],
             [22, 25, 28, 31, 34]
         ]
-        
+
 
         hidden_output = []
         for idx, indices in enumerate(hidden_weight_indices):
             neuron_id = idx + 4
             z = sum(Neuron(inputs[i], weights_dict[w_idx]).output() for i, w_idx in enumerate(indices)) + bias_dict[neuron_id]
             hidden_output.append(Neuron.sigmoid(z))
-            
+
         final_output = []
         for idx, indices in enumerate(output_weight_indices):
             neuron_id = idx + 9
             z = sum(Neuron(hidden_output[i], weights_dict[w_idx]).output() for i, w_idx in enumerate(indices)) + bias_dict[neuron_id]
             final_output.append(Neuron.sigmoid(z))
-            
+
         return final_output
 
     @staticmethod
     def ComputeFitness(x, training_data):
+	#weights = x[:35]
+	#biases = [0.0, 0.0, 0.0, 0.0] + list(x[35:])
         weights_dict = {}
         bias_dict = {0: 0, 1: 0, 2: 0, 3: 0}
-        
+
         for i in range(35):
             weights_dict[i] = x[i]
-            
+
         for i in range(8):
             neuron_id = i + 4
             bias_dict[neuron_id] = x[35 + i]
-            
+
         total_error = 0.0
-        
+
         for data in training_data:
             predictions = Neuron.Run_Network(data["inputs"], weights_dict, bias_dict)
             sample_error = sum((p - e) ** 2 for p, e in zip(predictions, data["expected"]))
             total_error += sample_error
-            
+
         return total_error
 
 
@@ -80,28 +82,32 @@ training_data = []
 for index, row in df.iterrows():
     inputs = [row[0], row[1], row[2], row[3]]
     label = int(row[4])
-    
+
     if label == 0:
         expected = [1.0, 0.0, 0.0]
     elif label == 1:
         expected = [0.0, 1.0, 0.0]
     else:
         expected = [0.0, 0.0, 1.0]
-        
+
     training_data.append({"inputs": inputs, "expected": expected})
 
 
 def ComputeAccuracy(dna):
-    weights_dict = {i: dna[i] for i in range(35)}
+    #weights = dna[:35]
+    #biases = [0.0, 0.0, 0.0, 0.0] + list(dna[35:])
+    weights_dict = {}
     bias_dict = {0: 0, 1: 0, 2: 0, 3: 0}
+    for i in range(35):
+       weights_dict[i] = dna[i]
     for i in range(8):
-        bias_dict[i + 4] = dna[35 + i]
-        
+       bias_dict[i + 4] = dna[35 + i]
+
     correct_count = 0
     for data in training_data:
         predictions = Neuron.Run_Network(data["inputs"], weights_dict, bias_dict)
         expected = data["expected"]
-        
+
         best_pred_idx = 0
         max_pred_val = predictions[0]
         for i in range(1, len(predictions)):
@@ -115,10 +121,10 @@ def ComputeAccuracy(dna):
             if expected[i] > max_true_val:
                 max_true_val = expected[i]
                 best_true_idx = i
-        
+
         if best_pred_idx == best_true_idx:
             correct_count += 1
-            
+
     return correct_count / len(training_data)
 
 
@@ -166,15 +172,15 @@ def ComputeNextGeneration(DNA, FITNESS, BESTINDEX, FR, SIGMA, training_data):
 
 
 NO_KIDS = 20
-NO_VAR = 35 + 8  
-NO_GEN = 400      
+NO_VAR = 35 + 8
+NO_GEN = 400
 FR = 1.0
 SIGMA = 1.0
 
 kid_dna = -2 + 4 * np.random.rand(NO_KIDS, NO_VAR)
 kid_fitness = np.zeros(NO_KIDS)
-history_accuracy = np.empty(NO_GEN) 
-history_fitness = np.empty(NO_GEN)  
+history_accuracy = np.empty(NO_GEN)
+history_fitness = np.empty(NO_GEN)
 
 for i in range(NO_KIDS):
     kid_fitness[i] = Neuron.ComputeFitness(kid_dna[i, :], training_data)
@@ -185,11 +191,11 @@ print(f"Initial Best Error: {kid_fitness[BestKid]}")
 for gen in range(NO_GEN):
     kid_dna, kid_fitness = ComputeNextGeneration(kid_dna, kid_fitness, BestKid, FR, SIGMA, training_data)
     BestKid = ComputeBestKid(kid_fitness)
-    
+
     current_accuracy = ComputeAccuracy(kid_dna[BestKid, :])
     history_accuracy[gen] = current_accuracy
     history_fitness[gen] = kid_fitness[BestKid]
-    
+
     print(f"Epoch {gen} - Best Accuracy = {current_accuracy * 100:.2f}% (Error: {kid_fitness[BestKid]:.4f})")
 
 #繪製圖表
