@@ -4,6 +4,8 @@ import numpy as np
 import math
 import pandas as pd
 
+
+#inputs, biases and weights for testing Run_Network function in class Neuron.
 inputs = [5.1, 3.8, 1.6, 0.2]
 
 biases = [
@@ -29,9 +31,11 @@ class Neuron:
 	def __init__(self, input_val, weight_val):
 		self.input = input_val
 		self.weight = weight_val
-
+	'''
 	def output(self):
 		return self.input*self.weight
+	'''
+
 	'''
 	def sigmoid(z):
 		if z < -709:
@@ -60,14 +64,44 @@ class Neuron:
 		hidden_output = []
 		for idx, indices in enumerate(hidden_weight_indices):
 			neuron_id = idx + 4
-			z = sum(Neuron(inputs[i], weights[w_idx]).output() for i, w_idx in enumerate(indices)) + biases[neuron_id]
+			#z = sum(Neuron(inputs[i], weights[w_idx]).output() for i, w_idx in enumerate(indices)) + biases[neuron_id]
+			z = sum(inputs[i]*weights[w_idx] for i, w_idx in enumerate(indices)) + biases[neuron_id]
 			hidden_output.append(Neuron.sigmoid(z))
 
 		final_output = []
 		for idx, indices in enumerate(output_weight_indices):
 			neuron_id = idx + 9
-			z = sum(Neuron(hidden_output[i], weights[w_idx]).output() for i, w_idx in enumerate(indices)) + biases[neuron_id]
+			#z = sum(Neuron(hidden_output[i], weights[w_idx]).output() for i, w_idx in enumerate(indices)) + biases[neuron_id]
+			z = sum(hidden_output[i]*weights[w_idx] for i, w_idx in enumerate(indices)) + biases[neuron_id]
 			final_output.append(Neuron.sigmoid(z))
 
 		return final_output
 print(Neuron.Run_Network(inputs, weights, biases))
+
+'''
+#class Storn_ga
+class Storn_ga:
+	def __init__(self, )
+'''
+
+'''
+#========================================
+#主程式開始
+#========================================
+NO_KIDS = 20
+#一代有20個個體
+NO_VAR = 35 + 8
+#NO_VAR = D(dimension 參數維度)
+NO_GEN = 400
+MF = 1.0
+#mutant factor (0~2)
+CR = 0.5
+#crossover constant (0~1)
+
+
+gen_val = 0
+while gen_val < NO_GEN:
+
+	for i in range(NO_KIDS):
+		
+'''
