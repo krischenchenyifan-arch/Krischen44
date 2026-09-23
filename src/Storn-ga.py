@@ -32,14 +32,16 @@ class Neuron:
 
 	def output(self):
 		return self.input*self.weight
-
+	'''
 	def sigmoid(z):
 		if z < -709:
 			return 0.0
 		elif z > 709:
 			return 1.0
 		return 1/(1 + math.exp(-z))
-
+	'''
+	def sigmoid(z):
+                return 1/(1 + math.exp(-z))
 	def Run_Network(inputs, weights, biases):
 		hidden_weight_indices = [
 	  	[0, 5, 10, 15],
