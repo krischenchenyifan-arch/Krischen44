@@ -4,7 +4,7 @@ import numpy as np
 import math
 import pandas as pd
 
-
+'''
 #inputs, biases and weights for testing Run_Network function in class Neuron.
 inputs = [5.1, 3.8, 1.6, 0.2]
 
@@ -25,18 +25,19 @@ weights = [
 	 -2.75999, -12.3828, 0.114309,
 	 4.90098, -10.149, -8.4269
 ]
-
+'''
 
 class Neuron:
 	def __init__(self, input_val, weight_val):
+	
 		self.input = input_val
 		self.weight = weight_val
 	'''
 	def output(self):
 		return self.input*self.weight
-	'''
+	
 
-	'''
+	
 	def sigmoid(z):
 		if z < -709:
 			return 0.0
@@ -84,7 +85,7 @@ class Storn_ga:
 	def __init__(self, )
 '''
 
-'''
+
 #========================================
 #主程式開始
 #========================================
@@ -98,10 +99,15 @@ MF = 1.0
 CR = 0.5
 #crossover constant (0~1)
 
+def Storn_ga(NO_KIDS, NO_VAR, NO_GEN, MF, CR):
 
-gen_val = 0
-while gen_val < NO_GEN:
+	gen_val = 0
+	while gen_val < NO_GEN:
 
-	for i in range(NO_KIDS):
-		
-'''
+		for i in range(NO_KIDS):
+			while (ParentA == ParentB) or (ParentA == ParentC) or (ParentB == ParentC):
+				ParentA = np.random.randint(NO_KIDS)
+				ParentB = np.random.randint(NO_KIDS)
+				ParentC = np.random.randint(NO_KIDS)
+			for j in range(NO_VAR):
+				
