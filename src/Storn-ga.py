@@ -85,20 +85,6 @@ class Storn_DE:
 	def __init__(self, )
 '''
 
-
-#========================================
-#主程式開始
-#========================================
-NO_KIDS = 20
-#一代有20個個體
-NO_VAR = 35 + 8
-#NO_VAR = D(dimension 參數維度)
-NO_GEN = 400
-MF = 1.0
-#mutant factor (0~2)
-CR = 0.5
-#crossover constant (0~1)
-
 def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 	mutant_vector = np.empty(NO_VAR)
 	randb = np.empty(NO_VAR)
@@ -124,3 +110,33 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 					mutant_vector[j] = 
 			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
 			target_fitness = Neuron.ComputeFitness( , training_data)
+
+
+#========================================
+#主程式開始
+#========================================
+NO_KIDS = 20
+#一代有20個個體
+NO_VAR = 35 + 8
+#NO_VAR = D(dimension 參數維度)
+NO_GEN = 400
+MF = 1.0
+#mutant factor (0~2)
+CR = 0.5
+#crossover constant (0~1)
+
+df = pd.read_csv('iris_lazy.data', header = None)
+
+training_data = []
+
+for index, row in df.tolist():
+	inputs = row[:4]
+	label = int(row[4])
+
+	if label == 0:
+		expected = [1.0, 0.0, 0.0]
+	elif label == 1:
+		expected = [0.0, 1.0, 0.0]
+	else label == 2:
+		expected = [0.0, 0.0, 1.0]
+	training_data.append({inputs}, {expected})
