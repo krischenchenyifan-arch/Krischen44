@@ -29,15 +29,14 @@ weights = [
 
 class Neuron:
 	def __init__(self, input_val, weight_val):
-	
 		self.input = input_val
 		self.weight = weight_val
 	'''
 	def output(self):
 		return self.input*self.weight
-	
 
-	
+
+
 	def sigmoid(z):
 		if z < -709:
 			return 0.0
@@ -54,7 +53,7 @@ class Neuron:
 	  	[2, 7, 12, 17],
 	  	[3, 8, 13, 18],
 	  	[4, 9, 14, 19]
-		] 
+		]
 
 		output_weight_indices = [
 	  	[20, 23, 26, 29, 32],
@@ -77,11 +76,12 @@ class Neuron:
 			final_output.append(Neuron.sigmoid(z))
 
 		return final_output
-print(Neuron.Run_Network(inputs, weights, biases))
+	def 
+#print(Neuron.Run_Network(inputs, weights, biases))
 
 '''
-#class Storn_ga
-class Storn_ga:
+#class Storn_DE
+class Storn_DE:
 	def __init__(self, )
 '''
 
@@ -99,15 +99,28 @@ MF = 1.0
 CR = 0.5
 #crossover constant (0~1)
 
-def Storn_ga(NO_KIDS, NO_VAR, NO_GEN, MF, CR):
+def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
+	mutant_vector = np.empty(NO_VAR)
+	randb = np.empty(NO_VAR)
 
 	gen_val = 0
 	while gen_val < NO_GEN:
-
+		#ParentA = 
+		#ParentB = 
+		#ParentC = 
 		for i in range(NO_KIDS):
-			while (ParentA == ParentB) or (ParentA == ParentC) or (ParentB == ParentC):
+			while ((ParentA == ParentB) or (ParentA == ParentC) or (ParentB == ParentC) or (ParentA == i) or (ParentB == i) or (ParentC == i)):
 				ParentA = np.random.randint(NO_KIDS)
 				ParentB = np.random.randint(NO_KIDS)
 				ParentC = np.random.randint(NO_KIDS)
 			for j in range(NO_VAR):
-				
+				#Mutation
+				mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
+				#Crossover
+				randb[j] = np.random.rand()
+				if ((randb[j] <= CR) or (j == rnbr[i])):
+					mutant_vector[j] = 
+				elif ((randb[j] > CR ) and (j != rnbr[i])):
+					mutant_vector[j] = 
+			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
+			target_fitness = Neuron.ComputeFitness( , training_data)
