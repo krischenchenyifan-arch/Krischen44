@@ -137,6 +137,6 @@ for index, row in df.tolist():
 		expected = [1.0, 0.0, 0.0]
 	elif label == 1:
 		expected = [0.0, 1.0, 0.0]
-	else label == 2:
+	else:
 		expected = [0.0, 0.0, 1.0]
 	training_data.append({inputs}, {expected})
