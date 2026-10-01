@@ -86,10 +86,15 @@ class Storn_DE:
 '''
 
 def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
+	#NO_KIDS, NO_VAR = DNA.shape(若有寫這行就不需要NO_VAR, NO_VAR在函數裡)
 	mutant_vector = np.empty(NO_VAR)
 	randb = np.empty(NO_VAR)
-
+	
 	gen_val = 0
+	#initialization
+	#我把initialization放在主程式中
+	#x1 =
+	#現在函數的DNA就是initialization後的初始DNA 
 	while gen_val < NO_GEN:
 		#ParentA = 
 		#ParentB = 
@@ -104,10 +109,11 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 				mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
 				#Crossover
 				randb[j] = np.random.rand()
+				rnbr[i] = np.random.randint(0, NO_VAR + 1) 
 				if ((randb[j] <= CR) or (j == rnbr[i])):
-					mutant_vector[j] = 
-				elif ((randb[j] > CR ) and (j != rnbr[i])):
-					mutant_vector[j] = 
+					mutant_vector[j] = DNA[ParentA, j]  + MF*(DNA[ParentB, j] - DNA[Parent, j])
+				else:
+					mutant_vector[j] = DNA[i][j] 
 			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
 			target_fitness = Neuron.ComputeFitness( , training_data)
 
@@ -140,3 +146,6 @@ for index, row in df.tolist():
 	else:
 		expected = [0.0, 0.0, 1.0]
 	training_data.append({inputs}, {expected})
+#initialization(initial population setting)
+initial_dna = -2 + 4*np.random.rand(NO_KIDS, NO_VAR)
+
