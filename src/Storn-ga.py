@@ -83,7 +83,7 @@ class Neuron:
 		weights = []
 		biases = [0, 0, 0, 0]
 		for i in range(35):
-			weights[i] = DNA[i]
+			weights.append(DNA[i,:])
 		for i in range(8):
 			biases[i + 4] = DNA[35 + i]
 		total_error = 0
@@ -136,9 +136,9 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 				if ((randb[j] <= CR) or (j == rnbr[i])):
 					mutant_vector[j] = DNA[ParentA, j]  + MF*(DNA[ParentB, j] - DNA[Parent, j])
 				else:
-					mutant_vector[j] = DNA[i][j] 
+					mutant_vector[j] = DNA[i,j] 
 			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
-			target_fitness = Neuron.ComputeFitness(DNA[i] , training_data)
+			target_fitness = Neuron.ComputeFitness(DNA[i,:] , training_data)
 
 			if mutant_fitness < target_fitness:
 				new_fitness = mutant_fitness
@@ -179,3 +179,4 @@ for row in df.values.tolist():
 #initialization(initial population setting)
 initial_dna = -2 + 4*np.random.rand(NO_KIDS, NO_VAR)
 
+result = Neuron.ComputeFitness(initial_dna, training_data)
