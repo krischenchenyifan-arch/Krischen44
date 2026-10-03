@@ -76,7 +76,24 @@ class Neuron:
 			final_output.append(Neuron.sigmoid(z))
 
 		return final_output
-	def 
+#cost function
+def ComputeFitness(DNA, training_data):
+	weights = []
+	biases = [0, 0, 0, 0]
+	for i in range(35):
+		weights[i] = DNA[i]
+	for i in range(8):
+		biases[i + 4] = DNA[35 + i]
+	total_error = 0
+
+	for data in training_data:
+		predictions = Neuron.Run_Network(data['inputs'], weights, biases)
+		sample_error = (sum((p - e)**2 for p, e in e))
+		total_error += sample_error
+	return total_error/len(data['expected'])
+		#MSE(Mean Squared Error)
+		#neuron 0~3 bias = 0, total 8 biases
+		#for i in range(8) i 從0開始記數，所以設定i + 4
 #print(Neuron.Run_Network(inputs, weights, biases))
 
 '''
@@ -104,9 +121,10 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 				ParentA = np.random.randint(NO_KIDS)
 				ParentB = np.random.randint(NO_KIDS)
 				ParentC = np.random.randint(NO_KIDS)
+\				#ParentA, ParentB, ParentC皆為數字
 			for j in range(NO_VAR):
 				#Mutation
-				mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
+				#mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
 				#Crossover
 				randb[j] = np.random.rand()
 				rnbr[i] = np.random.randint(0, NO_VAR + 1) 
@@ -115,8 +133,9 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 				else:
 					mutant_vector[j] = DNA[i][j] 
 			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
-			target_fitness = Neuron.ComputeFitness( , training_data)
+			target_fitness = Neuron.ComputeFitness(DNA , training_data)
 
+			if mutant_fitness < target_fitness
 
 #========================================
 #主程式開始
@@ -135,8 +154,10 @@ df = pd.read_csv('iris_lazy.data', header = None)
 
 training_data = []
 
-for index, row in df.tolist():
+for row in df.values.tolist():
 	inputs = row[:4]
+	#[:4]不包含4即0,1,2,3
+	#每一筆資料中前4項為input，最後一項為output
 	label = int(row[4])
 
 	if label == 0:
@@ -145,7 +166,10 @@ for index, row in df.tolist():
 		expected = [0.0, 1.0, 0.0]
 	else:
 		expected = [0.0, 0.0, 1.0]
-	training_data.append({inputs}, {expected})
+	#training_data.append({inputs}, {expected})
+	#list的append只能一次接受一個參數
+	training_data.append([inputs, expected])
+	#list of list
 #initialization(initial population setting)
 initial_dna = -2 + 4*np.random.rand(NO_KIDS, NO_VAR)
 
