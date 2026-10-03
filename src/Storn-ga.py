@@ -83,17 +83,18 @@ class Neuron:
 		weights = []
 		biases = [0, 0, 0, 0]
 		for i in range(35):
-			weights.append(DNA[i,:])
+			weights.append(DNA[i])
 		for i in range(8):
-			biases[i + 4] = DNA[35 + i]
+			biases.append(DNA[35 + i])
 		total_error = 0
 
 		for data in training_data:
-			predictions = Neuron.Run_Network(data["inputs"], weights, biases)
-
+			predictions = Neuron.Run_Network(data[0], weights, biases)
+			#predictions = Neuron.Run_Network(data['inputs'], weights, biases)
 			sample_error = 0
 			for i in range(len(predictions)):
-				sample_error += (predictions[i] - data["expected"][i])**2
+				sample_error += (predictions[i] - data[1][i])**2
+				#sample_error += (predictions[i] - data['expected'][i])**2
 			total_error += sample_error
 		return total_error/len(training_data)
 		#MSE(Mean Squared Error)
@@ -179,4 +180,14 @@ for row in df.values.tolist():
 #initialization(initial population setting)
 initial_dna = -2 + 4*np.random.rand(NO_KIDS, NO_VAR)
 
-result = Neuron.ComputeFitness(initial_dna, training_data)
+'''
+#20個(NO_KIDS)初代個體各自的fitness
+first_gen_fitness = []
+#Kids = [0] * NO_KIDS
+for i in range(NO_KIDS):
+	#Kid[i] = Neuron.ComputeFitness(initial_dna[i,:], training_data)
+	Kid = Neuron.ComputeFitness(initial_dna[i,:], training_data)
+	first_gen_fitness.append(Kid)
+print(first_gen_fitness)
+
+'''
