@@ -76,25 +76,30 @@ class Neuron:
 			final_output.append(Neuron.sigmoid(z))
 
 		return final_output
-#cost function
-def ComputeFitness(DNA, training_data):
-	weights = []
-	biases = [0, 0, 0, 0]
-	for i in range(35):
-		weights[i] = DNA[i]
-	for i in range(8):
-		biases[i + 4] = DNA[35 + i]
-	total_error = 0
+		#print(Neuron.Run_Network(inputs, weights, biases))
 
-	for data in training_data:
-		predictions = Neuron.Run_Network(data['inputs'], weights, biases)
-		sample_error = (sum((p - e)**2 for p, e in e))
-		total_error += sample_error
-	return total_error/len(data['expected'])
+		#cost function
+	def ComputeFitness(DNA, training_data):
+		weights = []
+		biases = [0, 0, 0, 0]
+		for i in range(35):
+			weights[i] = DNA[i]
+		for i in range(8):
+			biases[i + 4] = DNA[35 + i]
+		total_error = 0
+
+		for data in training_data:
+			predictions = Neuron.Run_Network(data["inputs"], weights, biases)
+
+			sample_error = 0
+			for i in range(len(predictions)):
+				sample_error += (predictions[i] - data["expected"][i])**2
+			total_error += sample_error
+		return total_error/len(training_data)
 		#MSE(Mean Squared Error)
 		#neuron 0~3 bias = 0, total 8 biases
 		#for i in range(8) i 從0開始記數，所以設定i + 4
-#print(Neuron.Run_Network(inputs, weights, biases))
+
 
 '''
 #class Storn_DE
@@ -121,7 +126,7 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 				ParentA = np.random.randint(NO_KIDS)
 				ParentB = np.random.randint(NO_KIDS)
 				ParentC = np.random.randint(NO_KIDS)
-\				#ParentA, ParentB, ParentC皆為數字
+				#ParentA, ParentB, ParentC皆為數字
 			for j in range(NO_VAR):
 				#Mutation
 				#mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
@@ -133,9 +138,10 @@ def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
 				else:
 					mutant_vector[j] = DNA[i][j] 
 			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
-			target_fitness = Neuron.ComputeFitness(DNA , training_data)
+			target_fitness = Neuron.ComputeFitness(DNA[i] , training_data)
 
-			if mutant_fitness < target_fitness
+			if mutant_fitness < target_fitness:
+				new_fitness = mutant_fitness
 
 #========================================
 #主程式開始
