@@ -103,7 +103,7 @@ class Neuron:
 
 
 
-
+'''
 def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_data):
 	NO_KIDS, NO_VAR = DNA.shape
 	#若有寫這行就不需要NO_VAR, NO_VAR在函數裡
@@ -148,7 +148,7 @@ def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_d
 			New_fitness[i] = mutant_fitness 
 			New_dna[i,:] = mutant_vector
 	return New_dna, New_fitness 
-
+'''
 #========================================
 #主程式開始
 #========================================
