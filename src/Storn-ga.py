@@ -102,51 +102,52 @@ class Neuron:
 		#for i in range(8) i 從0開始記數，所以設定i + 4
 
 
-'''
-#class Storn_DE
-class Storn_DE:
-	def __init__(self, )
-'''
 
-def Storn_ga(DNA, NO_KIDS, NO_VAR, NO_GEN, MF, CR, training_data):
-	#NO_KIDS, NO_VAR = DNA.shape(若有寫這行就不需要NO_VAR, NO_VAR在函數裡)
+
+def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_data):
+	NO_KIDS, NO_VAR = DNA.shape
+	#若有寫這行就不需要NO_VAR, NO_VAR在函數裡
 	mutant_vector = np.empty(NO_VAR)
 	randb = np.empty(NO_VAR)
-	rnbr = no.empty(NO_KIDS, dtype=int)
+	rnbr = np.empty(NO_KIDS, dtype=int)
+	New_dna = DNA.copy()
+	New_fitness = FITNESS.copy()
 	#gen_val = 0
-	#initialization
 	#我把initialization放在主程式中
-	#x1 =
 	#現在函數的DNA就是initialization後的初始DNA 
 	#while gen_val < NO_GEN:
-	for gen in range(NO_GEN):
-		for i in range(NO_KIDS):
-			ParentA = i
-			ParentB = i
-			ParentC = i
-			while ((ParentA == ParentB) or (ParentA == ParentC) or (ParentB == ParentC) or (ParentA == i) or (ParentB == i) or (ParentC == i)):
-				ParentA = np.random.randint(NO_KIDS)
-				ParentB = np.random.randint(NO_KIDS)
-				ParentC = np.random.randint(NO_KIDS)
-				#ParentA, ParentB, ParentC皆為數字(第幾個個體)
-			rnbr[i] = np.random.randint(0, NO_VAR)
-			for j in range(NO_VAR):
-				#Mutation
-				#mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
-				#Crossover
-				randb[j] = np.random.rand()
-				#randb[j] is the jth evaluation of a uniform random number generator with outcome between 0 and 1 i.e. [0,1]
-				#rnbr[i] = np.random.randint(0, NO_VAR + 1) 
-				if ((randb[j] <= CR) or (j == rnbr[i])):
-					mutant_vector[j] = DNA[ParentA, j]  + MF*(DNA[ParentB, j] - DNA[ParentC, j])
-				else:
-					mutant_vector[j] = DNA[i,j] 
-			mutant_fitness = Neuron.ComputeFitness(mutant_vector, training_data)
-			target_fitness = Neuron.ComputeFitness(DNA[i,:] , training_data)
-
-			if mutant_fitness < target_fitness:
-				DNA[i,:] = mutant_vector
-	return DNA
+	#for gen in range(NO_GEN):
+	for i in range(NO_KIDS):
+		ParentA = i
+		ParentB = i
+		ParentC = i
+		while ((ParentA == ParentB) or (ParentA == ParentC) or (ParentB == ParentC) or (ParentA == i) or (ParentB == i) or (ParentC == i)):
+			ParentA = np.random.randint(NO_KIDS)
+			ParentB = np.random.randint(NO_KIDS)
+			ParentC = np.random.randint(NO_KIDS)
+			#np.random.randint(0,44) 與np.random.randint(44)意義相同------->隨機生成0～43之間(含0和43)的整數
+			#ParentA, ParentB, ParentC皆為數字(第幾個個體)
+		rnbr[i] = np.random.randint(0, NO_VAR)
+		#論文中寫到rnbr[i]為random chosen index(1,2,...,D)
+		#原本我寫rnbr[i] = np.random.randint(1, NO_VAR + 1)，若rnbr[i]選到43，但j最大只到42，導致j == rnbr[i]不可能發生
+		for j in range(NO_VAR):
+			#Mutation
+			#mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
+			#Crossover
+			randb[j] = np.random.rand()
+			#randb[j] is the jth evaluation of a uniform random number generator with outcome between 0 and 1 i.e. [0,1]
+			#rnbr[i] = np.random.randint(0, NO_VAR + 1) 
+			if ((randb[j] <= CR) or (j == rnbr[i])):
+				mutant_vector[j] = DNA[ParentA, j]  + MF*(DNA[ParentB, j] - DNA[ParentC, j])
+			else:
+				mutant_vector[j] = DNA[i,j] 
+		mutant_fitness = ComputeFitness(mutant_vector, training_data)
+		#target_fitness[i] = Neuron.ComputeFitness(DNA[i,:] , training_data)
+		#target_fitness就是initial_dna(DNA)算出的fitness(函數中輸入的FITNESS)，移動到主程式設定
+		if (mutant_fitness < FITNESS[i]):
+			New_fitness[i] = mutant_fitness 
+			New_dna[i,:] = mutant_vector
+	return New_dna, New_fitness 
 
 #========================================
 #主程式開始
@@ -184,7 +185,7 @@ for row in df.values.tolist():
 #initialization(initial population setting)
 initial_dna = -2 + 4*np.random.rand(NO_KIDS, NO_VAR)
 
-
+'''
 #20個(NO_KIDS)初代個體各自的fitness
 first_gen_fitness = []
 #Kids = [0] * NO_KIDS
@@ -194,4 +195,4 @@ for i in range(NO_KIDS):
 	first_gen_fitness.append(Kid)
 print(first_gen_fitness)
 
-
+'''
