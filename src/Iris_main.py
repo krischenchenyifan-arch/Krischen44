@@ -27,11 +27,13 @@ weights = [
 ]
 '''
 
+'''
+#I have moved this to NN.py
 class Neuron:
 	def __init__(self, input_val, weight_val):
 		self.input = input_val
 		self.weight = weight_val
-	'''
+	
 	def output(self):
 		return self.input*self.weight
 
@@ -43,9 +45,7 @@ class Neuron:
 		elif z > 709:
 			return 1.0
 		return 1/(1 + math.exp(-z))
-	'''
-	def sigmoid(z):
-                return 1/(1 + math.exp(-z))
+
 	def Run_Network(inputs, weights, biases):
 		hidden_weight_indices = [
 	  	[0, 5, 10, 15],
@@ -77,29 +77,60 @@ class Neuron:
 
 		return final_output
 		#print(Neuron.Run_Network(inputs, weights, biases))
+'''
 
-		#cost function
-	def ComputeFitness(DNA, training_data):
-		weights = []
-		biases = [0, 0, 0, 0]
-		for i in range(35):
-			weights.append(DNA[i])
-		for i in range(8):
-			biases.append(DNA[35 + i])
-		total_error = 0
+#cost function
+def ComputeFitness(DNA, training_data):
+	weights = []
+	biases = [0, 0, 0, 0]
+	for i in range(35):
+		weights.append(DNA[i])
+	for i in range(8):
+		biases.append(DNA[35 + i])
+	total_error = 0
 
-		for data in training_data:
-			predictions = Neuron.Run_Network(data[0], weights, biases)
-			#predictions = Neuron.Run_Network(data['inputs'], weights, biases)
-			sample_error = 0
-			for i in range(len(predictions)):
-				sample_error += (predictions[i] - data[1][i])**2
-				#sample_error += (predictions[i] - data['expected'][i])**2
-			total_error += sample_error
-		return total_error/len(training_data)
-		#MSE(Mean Squared Error)
-		#neuron 0~3 bias = 0, total 8 biases
-		#for i in range(8) i 從0開始記數，所以設定i + 4
+	for data in training_data:
+		predictions = Neuron.Run_Network(data[0], weights, biases)
+		#predictions = Neuron.Run_Network(data['inputs'], weights, biases)
+		sample_error = 0
+		for i in range(len(predictions)):
+			sample_error += (predictions[i] - data[1][i])**2
+			#sample_error += (predictions[i] - data['expected'][i])**2
+		total_error += sample_error
+	return total_error/len(training_data)
+	#MSE(Mean Squared Error)
+	#neuron 0~3 bias = 0, total 8 biases
+	#for i in range(8) i 從0開始記數，所以設定i + 4
+
+ #Accuracy
+
+def ComputeAccuracy(DNA):
+	weights = []
+	biases = [0, 0, 0, 0]
+	for i in range(35):
+		weights.append(DNA[i])
+	for i in range(8):
+		biases.append(DNA[i + 35])
+	correct_count = 0
+	for data in training_data:
+		predictions = Neuron.Run_Network(data[0], weights, biases)
+		expected = data[1]
+		best_pre_index = 0
+		max_pre_val = predictions[0]
+		for j in range(1,len(predictions)):
+			if (predictons[j] > max_pre_val):
+				best_pre_index = j
+				max_pre_val = predictions[j]
+		best_data_index = 0
+		max_data_val = expected[0]
+		for k in range(1,len(expected)):
+			if (expected[k] > max_data_val):
+				best_data_index = k
+				max_data_val = expected[k]
+		if (best_pre_index == best_data_index):
+			correct_count += 1
+
+	return (correct_count/len(training_data))
 
 
 
