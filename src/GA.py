@@ -36,17 +36,17 @@ def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_d
 		for j in range(NO_VAR):
 			randb[j] = np.random.rand()
 			if ((randb[j] <= CR) or (j == rnbr[i])):
-				mutunt_vector[j] = DNA[ParentA, j] + MF * (DNA[ParentB, j] - DNA[ParentC, j])
+				mutant_vector[j] = DNA[ParentA, j] + MF * (DNA[ParentB, j] - DNA[ParentC, j])
 			else:
 				mutant_vector[j] = DNA[i, j]
-		mutant_fitness = ComputeFitness(mutant_vector, traning_data)
+		mutant_fitness = ComputeFitness(mutant_vector, training_data)
 		if (mutant_fitness < FITNESS[i]):
 			new_fitness[i] = mutant_fitness
 			new_dna[i,:] = mutant_vector
 	return new_dna, new_fitness
 
 
-def ComputeNextGeneration_Smith(DNA, FITNESS, FR, SIGMA, ComputeFitness, training_data):
+def ComputeNextGeneration_Smith(DNA, FITNESS, BESTINDEX, FR, SIGMA, ComputeFitness, training_data):
 	NO_KIDS, NO_VAR = DNA.shape
 	trial_dna = np.empty(NO_VAR)
 	new_fitness = FITNESS.copy()
@@ -65,7 +65,7 @@ def ComputeNextGeneration_Smith(DNA, FITNESS, FR, SIGMA, ComputeFitness, trainin
 
 		trial_fitness = ComputeFitness(trial_dna, training_data)
 		if (trial_fitness < FITNESS[i]):
-			new_fitness[i] = trialfitness
+			new_fitness[i] = trial_fitness
 			new_dna[i, :] = trial_dna
 
 	return new_dna, new_fitness
