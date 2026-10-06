@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pandas as pd
+from NN import Neuron
+from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith, ComputeBestKid
 
 '''
 #inputs, biases and weights for testing Run_Network function in class Neuron.
@@ -102,8 +104,7 @@ def ComputeFitness(DNA, training_data):
 	#neuron 0~3 bias = 0, total 8 biases
 	#for i in range(8) i 從0開始記數，所以設定i + 4
 
- #Accuracy
-
+#Accuracy
 def ComputeAccuracy(DNA):
 	weights = []
 	biases = [0, 0, 0, 0]
@@ -118,7 +119,7 @@ def ComputeAccuracy(DNA):
 		best_pre_index = 0
 		max_pre_val = predictions[0]
 		for j in range(1,len(predictions)):
-			if (predictons[j] > max_pre_val):
+			if (predictions[j] > max_pre_val):
 				best_pre_index = j
 				max_pre_val = predictions[j]
 		best_data_index = 0
@@ -183,16 +184,22 @@ def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_d
 #========================================
 #主程式開始
 #========================================
-NO_KIDS = 20
+NO_KIDS = 50
 #一代有20個個體
 NO_VAR = 35 + 8
 #NO_VAR = D(dimension 參數維度)
-NO_GEN = 400
+NO_GEN = 1000
+
+#Hyperparameters setting
 MF = 1.0
 #mutant factor (0~2)
 CR = 0.5
 #crossover constant (0~1)
 
+FR = 1.0
+
+SIGMA = 1.0
+#========================================
 df = pd.read_csv('iris_lazy.data', header = None)
 
 training_data = []
@@ -214,7 +221,52 @@ for row in df.values.tolist():
 	training_data.append([inputs, expected])
 	#list of list
 #initialization(initial population setting)
-initial_dna = -2 + 4*np.random.rand(NO_KIDS, NO_VAR)
+kid_dna = -0.5 + 1.0*np.random.rand(NO_KIDS, NO_VAR)
+kid_fitness = np.empty(NO_KIDS)
+
+for i in range(NO_KIDS):
+	kid_fitness[i] = ComputeFitness(kid_dna[i,:], training_data)
+Best_kid = ComputeBestKid(kid_fitness)
+
+#GA/DE algorithm 抓取該試戴中fitness值最佳(fitness 最小者，也就是total error 最低)的那一個個體計算並紀錄準確率
+#因為輸入ComputeAccuracy function的dna為dna[i,:]，其中i為擁有最佳fitness個體的index
+#===================================================
+#User input
+SOLVER = input("Choose your solver(Smith or Storn): ")
+if SOLVER not in ["Smith", "Storn"]:
+	print("Invalid input; Smith algorithm will be used by default ")
+	SOLVER = "Smith"
+#===================================================
+history_accuracy = np.empty(NO_GEN)
+history_fitness = np.empty(NO_GEN)
+
+for gen in range(NO_GEN):
+	if (SOLVER == "Smith"):
+		kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, Best_kid, FR, SIGMA, ComputeFitness, training_data)
+		Best_kid = ComputeBestKid(kid_fitness)
+	elif (SOLVER == "Storn"):
+		kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, MF, CR, ComputeFitness, training_data)
+		Best_kid = ComputeBestKid(kid_fitness)
+		#Best_kid is the index which has the best fitness
+
+
+	#calculate accuracy for each generation
+	current_accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
+	history_accuracy[gen] = current_accuracy
+	#history_fitness[gen] = ComputeFitness(kid_dna[Best_kid,:], training_data)
+	history_fitness[gen] = kid_fitness[Best_kid]
+	#====================================================
+	#gen的值從0開始到(NO_GEN-1)結束，應此應該寫(gen + 1)
+	print(f"Epoch{gen + 1}: -BestAccuracy : {history_accuracy[gen]*100:.2f}% (Error : {history_fitness[gen]:.4f})")
+
+Final_Accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
+Best_Total_Error = kid_fitness[Best_kid]
+print("==============final report===============")
+print(f"Select SOLVER : {SOLVER}")
+print(f"Best Total Error: {Best_Total_Error}")
+print(f"Final Accuracy: {Final_Accuracy}")
+
+
 
 '''
 #20個(NO_KIDS)初代個體各自的fitness
