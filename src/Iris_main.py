@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -185,15 +184,15 @@ def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_d
 #主程式開始
 #========================================
 NO_KIDS = 50
-#一代有20個個體
+
 NO_VAR = 35 + 8
 #NO_VAR = D(dimension 參數維度)
 NO_GEN = 1000
 
 #Hyperparameters setting
-MF = 1.0
+MF = 0.7
 #mutant factor (0~2)
-CR = 0.5
+CR = 0.9
 #crossover constant (0~1)
 
 FR = 1.0
@@ -228,7 +227,7 @@ for i in range(NO_KIDS):
 	kid_fitness[i] = ComputeFitness(kid_dna[i,:], training_data)
 Best_kid = ComputeBestKid(kid_fitness)
 
-#GA/DE algorithm 抓取該試戴中fitness值最佳(fitness 最小者，也就是total error 最低)的那一個個體計算並紀錄準確率
+#GA/DE algorithm 抓取該世代中fitness值最佳(fitness 最小者，也就是total error 最低)的那一個個體計算並紀錄準確率
 #因為輸入ComputeAccuracy function的dna為dna[i,:]，其中i為擁有最佳fitness個體的index
 #===================================================
 #User input
@@ -263,9 +262,30 @@ Final_Accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
 Best_Total_Error = kid_fitness[Best_kid]
 print("==============final report===============")
 print(f"Select SOLVER : {SOLVER}")
-print(f"Best Total Error: {Best_Total_Error}")
-print(f"Final Accuracy: {Final_Accuracy}")
+print(f"Best Total Error: {Best_Total_Error:.4f}")
+print(f"Final Accuracy: {Final_Accuracy*100:.2f}%")
 
+#==========================================
+#Smith and Storn
+#==========================================
+
+#fig,(ax1,ax2) = plt.subplots(nrows = 2, ncols = 1, figsize = (10,10))
+fig,(ax1,ax2) = plt.subplots(2, 1, figsize = (10, 10))
+ax1.semilogy(history_fitness, 'r-o', markersize = 3)
+#semilogy
+#history_fitness 被認定為縱軸（Y 軸）的資料
+#y軸為對數刻度
+#橫軸（X 軸）則由 Matplotlib 自動以 history_fitness 元素的索引位置來填入
+ax1.set(xlabel = 'Generation Number', ylabel = 'Total Error(Fitness)', title = f'[{SOLVER}] GA Training Neural Network - Total Error Descent')
+ax1.grid(True)
+#開啟網格
+
+ax2.plot(history_accuracy, 'b-')
+ax2.set(xlabel = 'Epoch', ylabel = 'Testing Accuracy', title = f'[{SOLVER}] GA Training Neural Network Accuracy on Iris')
+ax2.set_ylim(0, 1.05)
+ax2.grid(True)
+plt.tight_layout()
+plt.show()
 
 
 '''
