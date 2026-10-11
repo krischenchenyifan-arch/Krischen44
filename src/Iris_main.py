@@ -79,6 +79,15 @@ class Neuron:
 		return final_output
 		#print(Neuron.Run_Network(inputs, weights, biases))
 '''
+#define Ackley's function(2D--> 2 variances)
+#[(-5<X<5), (-5<Y<5)]
+def ComputeFitness_Ackley(DNA):
+	X = DNA[0]
+	Y = DNA[1]
+	#math.exp(1) = 2.71828歐拉常數Euler constant
+	fitness = 20 + math.exp(1) - 20 * math.exp(-0.2*(math.sqrt((X**2 + Y**2)/2) - math.exp(0.5 * (math.sin(2 * math.pi * X) + math.cos(2 * math.pi * Y) ))
+	return fitness
+
 
 #cost function
 def ComputeFitness(DNA, training_data):
