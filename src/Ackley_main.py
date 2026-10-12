@@ -5,7 +5,7 @@ import pandas as pd
 from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith
 
 
-#define 2D Ackley's function(2 variances)
+#Define 2D Ackley's function(2 variances)
 #[(-5 < X < 5), (-5 < Y < 5)]
 def Computefitness_Ackley(DNA):
 	X = DNA[0]
@@ -27,8 +27,34 @@ NUM_RUNS = 20
 #The mean best fitness is shown over 1000 unique simulations with each using 
 #20 children per generation over 50 generation.
 #====================================
+#[(-5<X<5), (-5<Y<5)] -------> kid_dna
+#Global minimum exists at (0, 0) with f(X,Y) = 0
+#====================================
+#hyperparameters(超參數)
+#(MF, CR)---> Storn , (FR, SIGMA)---> Smith
+#====================================
+#畫出DE演算法收斂曲線
+#Convergence towards the global minima for Ackley's function 
+solvers = [
+	"Smith", "Smith", "Smith", "Smith",
+	"Storn", "Storn", "Storn", "Storn"
+]
+
+parameter1 = [1.0, 1.0, 1.5, 1.5, 0.25, 0.25, 0.5, 0.5]
+parameter2 = [1.0, 1.5, 1.0, 1.5, 0.8, 1.0, 0.8, 1.0]
+
+labels = [
+	"Proposed DE, F = 1.0, \u03c3 = 1.0",
+	"Proposed DE, F = 1.0, \u03c3 = 1.5",
+	"Proposed DE, F = 1.5, \u03c3 = 1.0",
+	"Proposed DE, F = 1.5, \u03c3 = 1.5",
+	"DE, F = 0.25, CR = 0.8",
+	"DE, F = 0.25, CR = 1.0",
+	"DE, F = 0.5, CR = 0.8",
+	"DE, F = 0.5, CR = 1.0"
+]
 
 for run in range(NUM_RUNS):
-	kid_dna = -5 + 5 * np.random.rand(NO_KIDS, NO_VAR)
-
+	kid_dna = -5 + 10 * np.random.rand(NO_KIDS, NO_VAR)
+	#-5開始，長度10
 
