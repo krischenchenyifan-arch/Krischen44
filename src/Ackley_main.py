@@ -2,7 +2,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith
+from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith, ComputeBestKid
 
 
 #Define 2D Ackley's function(2 variances)
@@ -40,8 +40,8 @@ solvers = [
 	"Storn", "Storn", "Storn", "Storn"
 ]
 
-parameter1 = [1.0, 1.0, 1.5, 1.5, 0.25, 0.25, 0.5, 0.5]
-parameter2 = [1.0, 1.5, 1.0, 1.5, 0.8, 1.0, 0.8, 1.0]
+parameter1 = [1.0, 1.0, 1.5, 1.5, 0.25, 0.25, 0.5, 0.5] #Smith:FR   \ Storn:MF
+parameter2 = [1.0, 1.5, 1.0, 1.5, 0.8, 1.0, 0.8, 1.0]   #      SIGMA\	    CR
 
 labels = [
 	"Proposed DE, F = 1.0, \u03c3 = 1.0",
@@ -53,8 +53,25 @@ labels = [
 	"DE, F = 0.5, CR = 0.8",
 	"DE, F = 0.5, CR = 1.0"
 ]
+fig, ax = plt.subplots(figsize = (10, 8))
 
-for run in range(NUM_RUNS):
-	kid_dna = -5 + 10 * np.random.rand(NO_KIDS, NO_VAR)
-	#-5開始，長度10
+for i in range(len(solvers)):
+	current_solver = solvers[i] 
+	p1 = parameter1[i]
+	p2 = parameter2[i]
+	current_label = labels[i]
+	for run in range(NUM_RUNS):
+		kid_dna = -5 + 10 * np.random.rand(NO_KIDS, NO_VAR)
+	        #-5開始，長度10
+		kid_fitness = np.empty(NO_KIDS)
+		for j in range(NO_KIDS):
+			kid_fitness[j] = Computefitness_Ackley(kid_dna[j,:])
+		bestkid = ComputeBestKid(kid_fitness)
+		
+		for gen in range(NO_GEN):
+			if (current_solver == "Smith"):
+				kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, p1, p2, Computefitness_Ackley, None)
+			elif (current_solver == "Storn"):
+				kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, p1, p2, Computefitness_Ackley, None)
+			
 
