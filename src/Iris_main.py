@@ -28,57 +28,6 @@ weights = [
 ]
 '''
 
-'''
-#I have moved this to NN.py
-class Neuron:
-	def __init__(self, input_val, weight_val):
-		self.input = input_val
-		self.weight = weight_val
-	
-	def output(self):
-		return self.input*self.weight
-
-
-
-	def sigmoid(z):
-		if z < -709:
-			return 0.0
-		elif z > 709:
-			return 1.0
-		return 1/(1 + math.exp(-z))
-
-	def Run_Network(inputs, weights, biases):
-		hidden_weight_indices = [
-	  	[0, 5, 10, 15],
-	  	[1, 6, 11, 16],
-	  	[2, 7, 12, 17],
-	  	[3, 8, 13, 18],
-	  	[4, 9, 14, 19]
-		]
-
-		output_weight_indices = [
-	  	[20, 23, 26, 29, 32],
-	  	[21, 24, 27, 30, 33],
-	  	[22, 25, 28, 31, 34]
-		]
-
-		hidden_output = []
-		for idx, indices in enumerate(hidden_weight_indices):
-			neuron_id = idx + 4
-			#z = sum(Neuron(inputs[i], weights[w_idx]).output() for i, w_idx in enumerate(indices)) + biases[neuron_id]
-			z = sum(inputs[i]*weights[w_idx] for i, w_idx in enumerate(indices)) + biases[neuron_id]
-			hidden_output.append(Neuron.sigmoid(z))
-
-		final_output = []
-		for idx, indices in enumerate(output_weight_indices):
-			neuron_id = idx + 9
-			#z = sum(Neuron(hidden_output[i], weights[w_idx]).output() for i, w_idx in enumerate(indices)) + biases[neuron_id]
-			z = sum(hidden_output[i]*weights[w_idx] for i, w_idx in enumerate(indices)) + biases[neuron_id]
-			final_output.append(Neuron.sigmoid(z))
-
-		return final_output
-		#print(Neuron.Run_Network(inputs, weights, biases))
-'''
 #define Ackley's function(2D--> 2 variances)
 #[(-5<X<5), (-5<Y<5)]
 def ComputeFitness_Ackley(DNA):
@@ -142,53 +91,6 @@ def ComputeAccuracy(DNA):
 	return (correct_count/len(training_data))
 
 
-
-'''
-def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_data):
-	NO_KIDS, NO_VAR = DNA.shape
-	#若有寫這行就不需要NO_VAR, NO_VAR在函數裡
-	mutant_vector = np.empty(NO_VAR)
-	randb = np.empty(NO_VAR)
-	rnbr = np.empty(NO_KIDS, dtype=int)
-	New_dna = DNA.copy()
-	New_fitness = FITNESS.copy()
-	#gen_val = 0
-	#我把initialization放在主程式中
-	#現在函數的DNA就是initialization後的初始DNA 
-	#while gen_val < NO_GEN:
-	#for gen in range(NO_GEN):
-	for i in range(NO_KIDS):
-		ParentA = i
-		ParentB = i
-		ParentC = i
-		while ((ParentA == ParentB) or (ParentA == ParentC) or (ParentB == ParentC) or (ParentA == i) or (ParentB == i) or (ParentC == i)):
-			ParentA = np.random.randint(NO_KIDS)
-			ParentB = np.random.randint(NO_KIDS)
-			ParentC = np.random.randint(NO_KIDS)
-			#np.random.randint(0,44) 與np.random.randint(44)意義相同------->隨機生成0～43之間(含0和43)的整數
-			#ParentA, ParentB, ParentC皆為數字(第幾個個體)
-		rnbr[i] = np.random.randint(0, NO_VAR)
-		#論文中寫到rnbr[i]為random chosen index(1,2,...,D)
-		#原本我寫rnbr[i] = np.random.randint(1, NO_VAR + 1)，若rnbr[i]選到43，但j最大只到42，導致j == rnbr[i]不可能發生
-		for j in range(NO_VAR):
-			#Mutation
-			#mutant_vector[j] = DNA[ParentA, j] + MF*(DNA[ParentB, j] - DNA[ParentC, j])
-			#Crossover
-			randb[j] = np.random.rand()
-			#randb[j] is the jth evaluation of a uniform random number generator with outcome between 0 and 1 i.e. [0,1]
-			#rnbr[i] = np.random.randint(0, NO_VAR + 1) 
-			if ((randb[j] <= CR) or (j == rnbr[i])):
-				mutant_vector[j] = DNA[ParentA, j]  + MF*(DNA[ParentB, j] - DNA[ParentC, j])
-			else:
-				mutant_vector[j] = DNA[i,j] 
-		mutant_fitness = ComputeFitness(mutant_vector, training_data)
-		#target_fitness[i] = Neuron.ComputeFitness(DNA[i,:] , training_data)
-		#target_fitness就是initial_dna(DNA)算出的fitness(函數中輸入的FITNESS)，移動到主程式設定
-		if (mutant_fitness < FITNESS[i]):
-			New_fitness[i] = mutant_fitness 
-			New_dna[i,:] = mutant_vector
-	return New_dna, New_fitness 
-'''
 #========================================
 #主程式開始
 #========================================
