@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pandas as pd
+import time
 from NN import Neuron
 from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith, ComputeBestKid
 
@@ -98,8 +99,8 @@ NO_KIDS = 50
 
 NO_VAR = 35 + 8
 #NO_VAR = D(dimension 參數維度)
-NO_GEN = 400
-NO_test = 3
+NO_GEN = 1000
+NO_test = 10
 #Hyperparameters setting
 MF = 0.7
 #mutant factor (0~2)
@@ -147,6 +148,9 @@ SOLVER = input("Choose your solver(Smith or Storn): ")
 if SOLVER not in ["Smith", "Storn"]:
 	print("Invalid input; Smith algorithm will be used by default ")
 	SOLVER = "Smith"
+
+start_time = time.time()
+#使用者輸入SOLVER後開始計時
 #===================================================
 
 all_history_accuracy = []
@@ -160,7 +164,7 @@ final_best_fitness = []
 for test in range(NO_test):
 	kid_dna = -0.5 + 1.0*np.random.rand(NO_KIDS, NO_VAR)
 	kid_fitness = np.empty(NO_KIDS)
-	print(f"Run test{test + 1} ...")
+	print(f"{SOLVER}--Run test{test + 1} ...")
 	for i in range(NO_KIDS):
 		kid_fitness[i] = ComputeFitness(kid_dna[i,:], training_data)
 	Best_kid = ComputeBestKid(kid_fitness)
@@ -182,7 +186,7 @@ for test in range(NO_test):
 		history_fitness[test, gen] = kid_fitness[Best_kid]
 		#====================================================
 		#gen的值從0開始到(NO_GEN-1)結束，應此應該寫(gen + 1)
-		print(f"Epoch{gen + 1}: -BestAccuracy : {history_accuracy[test, gen]*100:.2f}% (Error : {history_fitness[test, gen]:.4f})")
+		print(f"Test{test + 1}:- Epoch{gen + 1}: -BestAccuracy : {history_accuracy[test, gen]*100:.2f}% (Error : {history_fitness[test, gen]:.4f})")
 
 	all_history_accuracy.append(history_accuracy[test, :])
 	all_history_fitness.append(history_fitness[test, :])
@@ -192,6 +196,8 @@ for test in range(NO_test):
 	#mean_history_accuracy.append()
 	#mean_history_fitness.append()
 	#history_accuracy[test]
+	#=====================================
+	current_best_error = kid_fitness[Best_kid]
 '''
 mean_accuracy_gen = []
 mean_fitness_gen = []
@@ -211,8 +217,12 @@ mean_best_accuracy = np.mean(final_best_accuracy)
 #mean_history_accuracy.append(mean_accuracy_gen)
 #mean_history_fitness.append(mean_fitness_gen)
 
-
-
+#=====================
+#結束計時
+end_time = time.time()
+elapsed_time = end_time - start_time
+#計算總秒數
+#=====================
 Final_Accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
 Best_Total_Error = kid_fitness[Best_kid]
 print("==============final report===============")
@@ -222,19 +232,20 @@ print(f"Final Best Accuracy: {Final_Accuracy*100:.2f}%")
 print(f"===========Run {NO_test} tests ============")
 print(f"Mean Total Error : {mean_best_fitness:.4f}")
 print(f"Mean Accuracy : {mean_best_accuracy*100:.2f}%")
+print(f"============Time============")
+print(f"Time : {elapsed_time:.2f}s")
 #==========================================
 #Smith and Storn
 #==========================================
 
 #fig,(ax1,ax2) = plt.subplots(nrows = 2, ncols = 1, figsize = (10,10))
-fig,(ax1,ax2) = plt.subplots(2, 1, figsize = (10, 10))
-fig,(ax3,ax4) = plt.subplots(2, 1, figsize = (10, 10))
+fig1,(ax1,ax2) = plt.subplots(2, 1, figsize = (10, 10))
+
 for test in range(NO_test):
 	ax1.semilogy(all_history_fitness[test], markersize = 3)
 	ax2.plot(all_history_accuracy[test])
 
-ax3.semilogy(mean_fitness_gen, markersize = 3)
-ax4.plot(mean_accuracy_gen)
+
 #===========================================
 #semilogy
 #history_fitness 被認定為縱軸（Y 軸）的資料
@@ -249,19 +260,27 @@ ax1.grid(True)
 ax2.set(xlabel = 'Epoch', ylabel = 'Testing Accuracy', title = f'[{SOLVER}] GA Training Neural Network Accuracy on Iris')
 ax2.set_ylim(0, 1.05)
 ax2.grid(True)
+plt.tight_layout()
+plt.savefig(f'{SOLVER}_individual_runs.png', dpi = 1000)
 #ax2.legend()
 
+#figure 2
+#=============================
+fig2,(ax3,ax4) = plt.subplots(2, 1, figsize = (10, 10))
 #===========================================
+ax3.semilogy(mean_fitness_gen, markersize = 3)
 ax3.set(xlabel = 'Generation Number', ylabel = 'Mean Total Error(Fitness)', title = f'[{SOLVER}] GA Training Neural Network - Mean Total Error Descent')
 ax3.grid(True)
 
 #===========================================
+ax4.plot(mean_accuracy_gen)
 ax4.set(xlabel = 'Epoch', ylabel = 'Mean Testing Accuracy', title = f'[{SOLVER}] GA Traing Neural Network Accuracy on Iris')
 ax4.set_ylim(0, 1.05)
 ax4.grid(True)
 
 #===========================================
 plt.tight_layout()
+plt.savefig(f'{SOLVER}_mean_performance.png', dpi = 1000)
 plt.show()
 
 
