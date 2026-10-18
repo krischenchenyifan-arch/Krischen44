@@ -53,10 +53,10 @@ def ComputeNextGeneration_Storn(DNA, FITNESS, MF, CR, ComputeFitness, training_d
 				mutant_vector[j] = DNA[ParentA, j] + MF * (DNA[ParentB, j] - DNA[ParentC, j])
 			else:
 				mutant_vector[j] = DNA[i, j]
-		#mutant_fitness = ComputeFitness(mutant_vector, training_data)
+		mutant_fitness = ComputeFitness(mutant_vector, training_data)
 		#target_fitness[i] = Neuron.ComputeFitness(DNA[i,:] , training_data)
 		#target_fitness就是initial_dna(DNA)算出的fitness(函數中輸入的FITNESS)，移動到主程式設定
-		mutant_fitness = ComputeFitness(mutant_vector)
+		#mutant_fitness = ComputeFitness(mutant_vector)
 		if (mutant_fitness < FITNESS[i]):
 			new_fitness[i] = mutant_fitness
 			new_dna[i,:] = mutant_vector
@@ -80,8 +80,8 @@ def ComputeNextGeneration_Smith(DNA, FITNESS, BESTINDEX, FR, SIGMA, ComputeFitne
 			Rnf = SIGMA*np.random.randn()
 			trial_dna[j] = Rf*DNA[ParentA, j] + (1.0 - Rf)*DNA[ParentB, j] + Rnf*(DNA[ParentB, j] - DNA[ParentC, j])
 
-		#trial_fitness = ComputeFitness(trial_dna, training_data)
-		trial_fitness = ComputeFitness(trial_dna)
+		trial_fitness = ComputeFitness(trial_dna, training_data)
+		#trial_fitness = ComputeFitness(trial_dna)
 		if (trial_fitness < FITNESS[i]):
 			new_fitness[i] = trial_fitness
 			new_dna[i, :] = trial_dna

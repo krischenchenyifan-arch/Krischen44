@@ -27,7 +27,7 @@ weights = [
 	 4.90098, -10.149, -8.4269
 ]
 '''
-
+'''
 #define Ackley's function(2D--> 2 variances)
 #[(-5<X<5), (-5<Y<5)]
 def ComputeFitness_Ackley(DNA):
@@ -36,7 +36,7 @@ def ComputeFitness_Ackley(DNA):
 	#math.exp(1) = 2.71828歐拉常數Euler constant
 	fitness = 20 + math.exp(1) - 20 * math.exp(-0.2*(math.sqrt((X**2 + Y**2)/2) - math.exp(0.5 * (math.sin(2 * math.pi * X) + math.cos(2 * math.pi * Y) ))
 	return fitness
-
+'''
 
 #cost function
 def ComputeFitness(DNA, training_data):
@@ -98,8 +98,8 @@ NO_KIDS = 50
 
 NO_VAR = 35 + 8
 #NO_VAR = D(dimension 參數維度)
-NO_GEN = 1000
-
+NO_GEN = 400
+NO_test = 3
 #Hyperparameters setting
 MF = 0.7
 #mutant factor (0~2)
@@ -130,6 +130,7 @@ for row in df.values.tolist():
 	#list的append只能一次接受一個參數
 	training_data.append([inputs, expected])
 	#list of list
+'''
 #initialization(initial population setting)
 kid_dna = -0.5 + 1.0*np.random.rand(NO_KIDS, NO_VAR)
 kid_fitness = np.empty(NO_KIDS)
@@ -137,7 +138,7 @@ kid_fitness = np.empty(NO_KIDS)
 for i in range(NO_KIDS):
 	kid_fitness[i] = ComputeFitness(kid_dna[i,:], training_data)
 Best_kid = ComputeBestKid(kid_fitness)
-
+'''
 #GA/DE algorithm 抓取該世代中fitness值最佳(fitness 最小者，也就是total error 最低)的那一個個體計算並紀錄準確率
 #因為輸入ComputeAccuracy function的dna為dna[i,:]，其中i為擁有最佳fitness個體的index
 #===================================================
@@ -147,54 +148,119 @@ if SOLVER not in ["Smith", "Storn"]:
 	print("Invalid input; Smith algorithm will be used by default ")
 	SOLVER = "Smith"
 #===================================================
-history_accuracy = np.empty(NO_GEN)
-history_fitness = np.empty(NO_GEN)
 
+all_history_accuracy = []
+all_history_fitness = []
+mean_history_accuracy = []
+mean_history_fitness = []
+history_accuracy = np.empty((NO_test, NO_GEN))
+history_fitness = np.empty((NO_test, NO_GEN))
+final_best_accuracy = []
+final_best_fitness = []
+for test in range(NO_test):
+	kid_dna = -0.5 + 1.0*np.random.rand(NO_KIDS, NO_VAR)
+	kid_fitness = np.empty(NO_KIDS)
+	print(f"Run test{test + 1} ...")
+	for i in range(NO_KIDS):
+		kid_fitness[i] = ComputeFitness(kid_dna[i,:], training_data)
+	Best_kid = ComputeBestKid(kid_fitness)
+
+	for gen in range(NO_GEN):
+		if (SOLVER == "Smith"):
+			kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, Best_kid, FR, SIGMA, ComputeFitness, training_data)
+			Best_kid = ComputeBestKid(kid_fitness)
+		elif (SOLVER == "Storn"):
+			kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, MF, CR, ComputeFitness, training_data)
+			Best_kid = ComputeBestKid(kid_fitness)
+			#Best_kid is the index which has the best fitness
+
+
+		#calculate accuracy for each generation
+		current_accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
+		history_accuracy[test, gen] = current_accuracy
+		#history_fitness[gen] = ComputeFitness(kid_dna[Best_kid,:], training_data)
+		history_fitness[test, gen] = kid_fitness[Best_kid]
+		#====================================================
+		#gen的值從0開始到(NO_GEN-1)結束，應此應該寫(gen + 1)
+		print(f"Epoch{gen + 1}: -BestAccuracy : {history_accuracy[test, gen]*100:.2f}% (Error : {history_fitness[test, gen]:.4f})")
+
+	all_history_accuracy.append(history_accuracy[test, :])
+	all_history_fitness.append(history_fitness[test, :])
+
+	final_best_accuracy.append(ComputeAccuracy(kid_dna[Best_kid,:]))
+	final_best_fitness.append(kid_fitness[Best_kid])
+	#mean_history_accuracy.append()
+	#mean_history_fitness.append()
+	#history_accuracy[test]
+'''
+mean_accuracy_gen = []
+mean_fitness_gen = []
 for gen in range(NO_GEN):
-	if (SOLVER == "Smith"):
-		kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, Best_kid, FR, SIGMA, ComputeFitness, training_data)
-		Best_kid = ComputeBestKid(kid_fitness)
-	elif (SOLVER == "Storn"):
-		kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, MF, CR, ComputeFitness, training_data)
-		Best_kid = ComputeBestKid(kid_fitness)
-		#Best_kid is the index which has the best fitness
+	sum_accuracy_gen = sum(history_accuracy[:, gen])
+	sum_fitness_gen = sum(history_fitness[:, gen])
+	mean_accuracy_gen.append(sum_accuracy_gen / NO_test)
+	mean_fitness_gen.append(sum_fitness_gen / NO_test)
+'''
+#=========================================
+#計算平均accuracy和fitness
+mean_fitness_gen = np.mean(history_fitness, axis = 0)
+mean_accuracy_gen = np.mean(history_accuracy, axis = 0)
+mean_best_fitness = np.mean(final_best_fitness)
+mean_best_accuracy = np.mean(final_best_accuracy)
+#mean_fitness_gen = history_fitness[gen] / NO_test
+#mean_history_accuracy.append(mean_accuracy_gen)
+#mean_history_fitness.append(mean_fitness_gen)
 
 
-	#calculate accuracy for each generation
-	current_accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
-	history_accuracy[gen] = current_accuracy
-	#history_fitness[gen] = ComputeFitness(kid_dna[Best_kid,:], training_data)
-	history_fitness[gen] = kid_fitness[Best_kid]
-	#====================================================
-	#gen的值從0開始到(NO_GEN-1)結束，應此應該寫(gen + 1)
-	print(f"Epoch{gen + 1}: -BestAccuracy : {history_accuracy[gen]*100:.2f}% (Error : {history_fitness[gen]:.4f})")
 
 Final_Accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
 Best_Total_Error = kid_fitness[Best_kid]
 print("==============final report===============")
 print(f"Select SOLVER : {SOLVER}")
 print(f"Best Total Error: {Best_Total_Error:.4f}")
-print(f"Final Accuracy: {Final_Accuracy*100:.2f}%")
-
+print(f"Final Best Accuracy: {Final_Accuracy*100:.2f}%")
+print(f"===========Run {NO_test} tests ============")
+print(f"Mean Total Error : {mean_best_fitness:.4f}")
+print(f"Mean Accuracy : {mean_best_accuracy*100:.2f}%")
 #==========================================
 #Smith and Storn
 #==========================================
 
 #fig,(ax1,ax2) = plt.subplots(nrows = 2, ncols = 1, figsize = (10,10))
 fig,(ax1,ax2) = plt.subplots(2, 1, figsize = (10, 10))
-ax1.semilogy(history_fitness, 'r-o', markersize = 3)
+fig,(ax3,ax4) = plt.subplots(2, 1, figsize = (10, 10))
+for test in range(NO_test):
+	ax1.semilogy(all_history_fitness[test], markersize = 3)
+	ax2.plot(all_history_accuracy[test])
+
+ax3.semilogy(mean_fitness_gen, markersize = 3)
+ax4.plot(mean_accuracy_gen)
+#===========================================
 #semilogy
 #history_fitness 被認定為縱軸（Y 軸）的資料
 #y軸為對數刻度
 #橫軸（X 軸）則由 Matplotlib 自動以 history_fitness 元素的索引位置來填入
 ax1.set(xlabel = 'Generation Number', ylabel = 'Total Error(Fitness)', title = f'[{SOLVER}] GA Training Neural Network - Total Error Descent')
 ax1.grid(True)
+#ax1.legend()
 #開啟網格
-
-ax2.plot(history_accuracy, 'b-')
+#===========================================
+#ax2.plot(history_accuracy, 'b-')
 ax2.set(xlabel = 'Epoch', ylabel = 'Testing Accuracy', title = f'[{SOLVER}] GA Training Neural Network Accuracy on Iris')
 ax2.set_ylim(0, 1.05)
 ax2.grid(True)
+#ax2.legend()
+
+#===========================================
+ax3.set(xlabel = 'Generation Number', ylabel = 'Mean Total Error(Fitness)', title = f'[{SOLVER}] GA Training Neural Network - Mean Total Error Descent')
+ax3.grid(True)
+
+#===========================================
+ax4.set(xlabel = 'Epoch', ylabel = 'Mean Testing Accuracy', title = f'[{SOLVER}] GA Traing Neural Network Accuracy on Iris')
+ax4.set_ylim(0, 1.05)
+ax4.grid(True)
+
+#===========================================
 plt.tight_layout()
 plt.show()
 

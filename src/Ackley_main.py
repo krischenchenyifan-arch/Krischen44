@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith, ComputeBestKid
-
+#np.random.seed(42)
 
 #Define 2D Ackley's function(2 variances)
 #[(-5 < X < 5), (-5 < Y < 5)]
@@ -23,7 +23,7 @@ def Computefitness_Ackley(DNA):
 NO_GEN = 50
 NO_VAR = 2
 NO_KIDS = 20
-NUM_RUNS = 20
+NUM_RUNS = 1000
 #The mean best fitness is shown over 1000 unique simulations with each using 
 #20 children per generation over 50 generation.
 #====================================
@@ -60,6 +60,7 @@ for i in range(len(solvers)):
 	p1 = parameter1[i]
 	p2 = parameter2[i]
 	current_label = labels[i]
+	all_runs_history = np.zeros((NUM_RUNS, NO_GEN))
 	for run in range(NUM_RUNS):
 		kid_dna = -5 + 10 * np.random.rand(NO_KIDS, NO_VAR)
 	        #-5開始，長度10
@@ -67,11 +68,21 @@ for i in range(len(solvers)):
 		for j in range(NO_KIDS):
 			kid_fitness[j] = Computefitness_Ackley(kid_dna[j,:])
 		bestkid = ComputeBestKid(kid_fitness)
-		
+		history_fitness = np.empty(NO_GEN)
 		for gen in range(NO_GEN):
 			if (current_solver == "Smith"):
-				kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, p1, p2, Computefitness_Ackley, None)
+				kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, bestkid, p1, p2, Computefitness_Ackley, None)
 			elif (current_solver == "Storn"):
 				kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, p1, p2, Computefitness_Ackley, None)
-			
+			bestkid = ComputeBestKid(kid_fitness)
+			history_fitness[gen] = kid_fitness[bestkid]
+		all_runs_history[run,:] = history_fitness
+	mean_history_fitness = np.mean(all_runs_history, axis = 0)
+	
+	ax.semilogy(range(1,NO_GEN + 1), mean_history_fitness, markersize = 3, label = current_label)
 
+ax.set(xlabel = 'Generation', ylabel = 'Mean Fittest Solution - |f(x_MIN, y_MIN)|', title = "Comparison of DE Algorithm on Ackley's Function")
+ax.grid(True, which = 'both', ls = '--')
+ax.legend(loc = "lower left", fontsize = 9)
+plt.tight_layout()
+plt.show()
