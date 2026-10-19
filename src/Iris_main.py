@@ -100,7 +100,7 @@ NO_KIDS = 50
 NO_VAR = 35 + 8
 #NO_VAR = D(dimension 參數維度)
 NO_GEN = 1000
-NO_test = 10
+NO_test = 1000
 #Hyperparameters setting
 MF = 0.7
 #mutant factor (0~2)
@@ -161,6 +161,10 @@ history_accuracy = np.empty((NO_test, NO_GEN))
 history_fitness = np.empty((NO_test, NO_GEN))
 final_best_accuracy = []
 final_best_fitness = []
+
+global_best_fitness = float('inf')
+global_best_acc = 0.0
+
 for test in range(NO_test):
 	kid_dna = -0.5 + 1.0*np.random.rand(NO_KIDS, NO_VAR)
 	kid_fitness = np.empty(NO_KIDS)
@@ -197,7 +201,14 @@ for test in range(NO_test):
 	#mean_history_fitness.append()
 	#history_accuracy[test]
 	#=====================================
-	current_best_error = kid_fitness[Best_kid]
+	current_best_fitness = kid_fitness[Best_kid]
+	current_best_acc = ComputeAccuracy(kid_dna[Best_kid, :])
+	
+	if (current_best_fitness < global_best_fitness):
+		global_best_fitness = current_best_fitness
+
+	if (current_best_acc > global_best_acc):
+		global_best_acc = current_best_acc 
 '''
 mean_accuracy_gen = []
 mean_fitness_gen = []
@@ -223,12 +234,10 @@ end_time = time.time()
 elapsed_time = end_time - start_time
 #計算總秒數
 #=====================
-Final_Accuracy = ComputeAccuracy(kid_dna[Best_kid,:])
-Best_Total_Error = kid_fitness[Best_kid]
 print("==============final report===============")
 print(f"Select SOLVER : {SOLVER}")
-print(f"Best Total Error: {Best_Total_Error:.4f}")
-print(f"Final Best Accuracy: {Final_Accuracy*100:.2f}%")
+print(f"Global Best Total Error({NO_test}tests): {global_best_fitness:.4f}")
+print(f"Global Best Accuracy({NO_test}tests): {global_best_acc*100:.2f}%")
 print(f"===========Run {NO_test} tests ============")
 print(f"Mean Total Error : {mean_best_fitness:.4f}")
 print(f"Mean Accuracy : {mean_best_accuracy*100:.2f}%")
@@ -274,7 +283,7 @@ ax3.grid(True)
 
 #===========================================
 ax4.plot(mean_accuracy_gen)
-ax4.set(xlabel = 'Epoch', ylabel = 'Mean Testing Accuracy', title = f'[{SOLVER}] GA Traing Neural Network Accuracy on Iris')
+ax4.set(xlabel = 'Epoch', ylabel = 'Mean Testing Accuracy', title = f'[{SOLVER}] GA Training Neural Network Accuracy on Iris')
 ax4.set_ylim(0, 1.05)
 ax4.grid(True)
 
