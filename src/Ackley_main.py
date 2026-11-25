@@ -2,8 +2,8 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import copy
 from GA import ComputeNextGeneration_Storn, ComputeNextGeneration_Smith, ComputeBestKid
-#np.random.seed(42)
 
 #Define 2D Ackley's function(2 variances)
 #[(-5 < X < 5), (-5 < Y < 5)]
@@ -44,15 +44,18 @@ parameter1 = [1.0, 1.0, 1.5, 1.5, 0.25, 0.25, 0.5, 0.5] #Smith:FR   \ Storn:MF
 parameter2 = [1.0, 1.5, 1.0, 1.5, 0.8, 1.0, 0.8, 1.0]   #      SIGMA\	    CR
 
 labels = [
-	"Proposed DE, F = 1.0, \u03c3 = 1.0",
-	"Proposed DE, F = 1.0, \u03c3 = 1.5",
-	"Proposed DE, F = 1.5, \u03c3 = 1.0",
-	"Proposed DE, F = 1.5, \u03c3 = 1.5",
-	"DE, F = 0.25, CR = 0.8",
-	"DE, F = 0.25, CR = 1.0",
-	"DE, F = 0.5, CR = 0.8",
-	"DE, F = 0.5, CR = 1.0"
+	"Proposed DE, FR = 1.0, \u03c3 = 1.0",
+	"Proposed DE, FR = 1.0, \u03c3 = 1.5",
+	"Proposed DE, FR = 1.5, \u03c3 = 1.0",
+	"Proposed DE, FR = 1.5, \u03c3 = 1.5",
+	"DE, MF = 0.25, CR = 0.8",
+	"DE, MF = 0.25, CR = 1.0",
+	"DE, MF = 0.5, CR = 0.8",
+	"DE, MF = 0.5, CR = 1.0"
 ]
+
+markers = ['o', '.', 's', '+', '<', '>', '^', 'v']
+
 fig, ax = plt.subplots(figsize = (10, 8))
 
 for i in range(len(solvers)):
@@ -62,24 +65,42 @@ for i in range(len(solvers)):
 	current_label = labels[i]
 	all_runs_history = np.zeros((NUM_RUNS, NO_GEN))
 	for run in range(NUM_RUNS):
+		#每跑一次演算法，重新隨機設定NUM_KIDS個小孩的DNA
 		kid_dna = -5 + 10 * np.random.rand(NO_KIDS, NO_VAR)
 	        #-5開始，長度10
-		kid_fitness = np.empty(NO_KIDS)
+		kid_fitness = np.zeros(NO_KIDS)
+		#kid_fitness = np.empty(NO_KIDS)
 		for j in range(NO_KIDS):
 			kid_fitness[j] = Computefitness_Ackley(kid_dna[j,:])
-		bestkid = ComputeBestKid(kid_fitness)
-		history_fitness = np.empty(NO_GEN)
+		#bestkid = ComputeBestKid(kid_fitness)
+		#Smith_ga須使用到BESTINDEX
+		#history_fitness = np.empty(NO_GEN)
+		history_fitness = np.zeros(NO_GEN)
+
+		#========================================
+		#kid_dna_ga = kid_dna.copy()
+		kid_dna_ga = copy.deepcopy(kid_dna)
+		#kid_fitness_ga = kid_fitness.copy()
+		kid_fitness_ga = copy.deepcopy(kid_fitness)
+		bestkid = ComputeBestKid(kid_fitness_ga)
+		#bestkid = ComputeBestKid(kid_fitness)
+		#========================================
 		for gen in range(NO_GEN):
 			if (current_solver == "Smith"):
-				kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, bestkid, p1, p2, Computefitness_Ackley, None)
+				#kid_dna, kid_fitness = ComputeNextGeneration_Smith(kid_dna, kid_fitness, bestkid, p1, p2, Computefitness_Ackley)
+				kid_dna_ga, kid_fitness_ga = ComputeNextGeneration_Smith(kid_dna_ga, kid_fitness_ga, bestkid, p1, p2, Computefitness_Ackley)
 			elif (current_solver == "Storn"):
-				kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, p1, p2, Computefitness_Ackley, None)
-			bestkid = ComputeBestKid(kid_fitness)
-			history_fitness[gen] = kid_fitness[bestkid]
+				#kid_dna, kid_fitness = ComputeNextGeneration_Storn(kid_dna, kid_fitness, p1, p2, Computefitness_Ackley)
+				kid_dna_ga, kid_fitness_ga = ComputeNextGeneration_Storn(kid_dna_ga, kid_fitness_ga, p1, p2, Computefitness_Ackley)
+			bestkid = ComputeBestKid(kid_fitness_ga)
+			#bestkid = ComputeBestKid(kid_fitness)
+			#history_fitness[gen] = kid_fitness[bestkid]
+			history_fitness[gen] = kid_fitness_ga[bestkid]
+			#history_fitness[gen] = np.mean(kid_fitness) 
 		all_runs_history[run,:] = history_fitness
 	mean_history_fitness = np.mean(all_runs_history, axis = 0)
 	
-	ax.semilogy(range(1,NO_GEN + 1), mean_history_fitness, markersize = 3, label = current_label)
+	ax.semilogy(range(1,NO_GEN + 1), mean_history_fitness, marker = markers[i], markersize = 6, label = current_label)
 
 ax.set(xlabel = 'Generation', ylabel = 'Mean Fittest Solution - |f(x_MIN, y_MIN)|', title = "Comparison of DE Algorithm on Ackley's Function")
 ax.grid(True, which = 'both', ls = '--')
